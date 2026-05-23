@@ -48,6 +48,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin, 
   final ScrollController _scrollController = ScrollController();  // built-in class
   final GlobalKey _moreInfoSectionKey = GlobalKey();  // build-in class
 
+  final GlobalKey _statusTextKey = GlobalKey();
+
 
   List<EmotionScore> _topResults = [];  // from model_service.dart (EmotionScore)
   bool _modelReady = false;
@@ -81,13 +83,21 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin, 
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   String? _selectedUserEmotion;
+  final ScrollController _homeScrollController = ScrollController();
 
 
   @override
   void initState() {   // lifecycle method, called just once when widget created
     super.initState();
-    _initializeCamera();//talks with phone hardware tor take permissions and turn front camera
-    _initModel(); // loads .tflite model into Phone' RAM (can take few seconds)
+    _initializeCamera().then((_) {
+      _scrollToCameraInstructions();
+      _showTipsSheet();
+    });
+
+    _scrollToPredictionResult();
+
+    _initModel();
+
   }
 
 
@@ -119,18 +129,34 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin, 
     return count;
   }
 
-  bool _isDescriptionValid(String text) {
-    int wordCount = 0;
 
-    for (var word in text.trim().split(' ')) {
-      if (word.isNotEmpty) {
-        wordCount++;
+  void _scrollToCameraInstructions() {
+    Future.delayed(const Duration(milliseconds: 600), () {
+      if (_homeScrollController.hasClients) {
+        final maxScroll = _homeScrollController.position.maxScrollExtent;
+
+        _homeScrollController.animateTo(
+          (90.0).clamp(0.0, maxScroll).toDouble(),
+          duration: const Duration(milliseconds: 450),
+          curve: Curves.easeOut,
+        );
       }
-    }
-
-    return wordCount <= 30;
+    });
   }
 
+  void _scrollToPredictionResult() {
+    Future.delayed(const Duration(milliseconds: 400), () {
+      if (_homeScrollController.hasClients) {
+        final maxScroll = _homeScrollController.position.maxScrollExtent;
+
+        _homeScrollController.animateTo(
+          (0.0).clamp(0.0, maxScroll).toDouble(),
+          duration: const Duration(milliseconds: 450),
+          curve: Curves.easeOut,
+        );
+      }
+    });
+  }
 
 
   Future<void> _showSaveMoodDetailsSheet() async {
@@ -585,6 +611,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin, 
         _debugMessage = 'Error: $e';
       });
     }
+
+    _scrollToPredictionResult();
   }
 
   Color _emotionColor(String emotion) {
@@ -1169,7 +1197,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin, 
   }
 
 
-  Widget _buildHeader() {
+/*  Widget _buildHeader() {
     return const Padding(
       padding: EdgeInsets.symmetric(horizontal: 20),
       child: Column(
@@ -1188,12 +1216,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin, 
         ],
       ),
     );
-  }
+  }*/
 
 
   Widget _buildCameraSection() {
     if (_capturedPreviewBytes != null) {
       return Container(
+        height: 430,
         margin: const EdgeInsets.symmetric(horizontal: 20),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(28),
@@ -1219,7 +1248,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin, 
 
     if (!_isCameraInitialized || _controller == null) {
       return Container(
-        height: 420,
+        height: 360,
         margin: const EdgeInsets.symmetric(horizontal: 20),
         decoration: BoxDecoration(
           color: const Color(0xFF171522),
@@ -1235,6 +1264,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin, 
     final previewAspectRatio = 1 / controller.value.aspectRatio;
 
     return Container(
+      height: 430,
       margin: const EdgeInsets.symmetric(horizontal: 20),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(28),
@@ -1275,8 +1305,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin, 
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: const [
-              Text(
+            children: [
+              const Text(
                 'How to use Face2Mood',
                 style: TextStyle(
                   color: Colors.white,
@@ -1284,18 +1314,40 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin, 
                   fontWeight: FontWeight.w700,
                 ),
               ),
-              SizedBox(height: 16),
-              Text(
-                '• Keep your face centered in the frame\n'
-                    '• Use good lighting\n'
-                    '• Look toward the camera\n'
-                    '• Try clear facial expressions\n'
-                    '• Results are indicative, not perfect\n'
-                    '• Processing is performed locally on your device',
+              const SizedBox(height: 16),
+              const Text(
+                        '• Center your face in the frame\n'
+                        '• Use clear and natural expressions\n'
+                        '• If detection fails, tap Retry and try again\n'
+                        '• Check “More info” after prediction\n'
+                        '• "Save to stats" to track progression\n'
+                        '• View history in the "Stats" tab\n',
                 style: TextStyle(
                   color: Colors.white70,
                   fontSize: 15,
                   height: 1.5,
+                ),
+              ),
+              const SizedBox(height: 24),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () => Navigator.pop(context),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF38D26F),
+                    foregroundColor: Colors.black,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                  ),
+                  child: const Text(
+                    'Got it!',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
                 ),
               ),
             ],
@@ -1332,8 +1384,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin, 
           GestureDetector(
             onTap: _showTipsSheet,
             child: Container(
-              width: 62,
-              height: 62,
+              width: 60,
+              height: 60,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: const Color(0xFF1B1828),
@@ -1342,7 +1394,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin, 
               child: const Icon(
                 Icons.info_outline,
                 color: Colors.white,
-                size: 28,
+                size: 30,
               ),
             ),
           ),
@@ -1355,8 +1407,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin, 
                     ? _captureAndPredict
                     : null,
                 child: Container(
-                  width: 84,
-                  height: 84,
+                  width: 80,
+                  height: 80,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: (_modelReady && _capturedPreviewBytes == null)
@@ -1385,7 +1437,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin, 
                     : 'Tap to analyze',
                 style: const TextStyle(
                   color: Colors.white70,
-                  fontSize: 14,
+                  fontSize: 13.5,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ],
@@ -1393,10 +1446,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin, 
 
           // Right button - Retry / Reset
           GestureDetector(
-            onTap: _clearResult,
+            onTap: () {
+              _clearResult();
+              _scrollToCameraInstructions();
+            },
             child: Container(
-              width: 62,
-              height: 62,
+              width: 60,
+              height: 60,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: const Color(0xFF1B1828),
@@ -1421,6 +1477,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin, 
     final isSuccess = _debugMessage == 'Prediction completed';
 
     return Padding(
+      key: _statusTextKey,
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Text(
         _debugMessage,
@@ -1535,6 +1592,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin, 
     _controller?.dispose();
     _emotionModelService.close();
     _faceDetectionService.close();
+    _homeScrollController.dispose();
     super.dispose();
   }
 
@@ -1546,12 +1604,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin, 
       backgroundColor: const Color(0xFF0A0813),
       body: SafeArea(
         child: SingleChildScrollView(
-          controller: _scrollController,
+          controller: _homeScrollController,
           padding: const EdgeInsets.symmetric(vertical: 20),
           child: Column(
             children: [
-              _buildHeader(),
-              const SizedBox(height: 20),
+              /*_buildHeader(),
+              const SizedBox(height: 20),*/
 
               _buildResultCard(),
               const SizedBox(height: 14),
