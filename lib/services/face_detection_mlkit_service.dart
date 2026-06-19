@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:typed_data';
 import 'dart:math';
+import 'package:flutter/foundation.dart';
 
 // Importing Google's ML Kit Face Detection package
 import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
@@ -99,7 +100,7 @@ class FaceDetectionService {
     // Logic: If any of these are null, the face is definitely cut off.
     if (leftEye == null || rightEye == null || leftEar == null || rightEar == null || bottomMouth == null) {
       await _cleanup(tempFile);
-      print("Rejecting: Face extremities are out of frame.");
+      debugPrint("Rejecting: Face extremities are out of frame.");
       return FaceDetectionResult(error: "Face extremities out of frame. Show your whole face.");
     }
 
@@ -183,8 +184,7 @@ class FaceDetectionService {
     // --- Lighting Robustness Module ---
     // 19. Calculate the mean pixel intensity (brightness) of the cropped face
     final brightness = _calculateMeanIntensity(cropped);
-    print('DEBUG: Mean Pixel Intensity: $brightness');
-
+    debugPrint('DEBUG: Mean Pixel Intensity: $brightness');
     if (brightness < 50) {
       await _cleanup(tempFile);
       return FaceDetectionResult(error: "It's too dark for an accurate prediction.");

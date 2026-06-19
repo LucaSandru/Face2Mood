@@ -22,13 +22,11 @@ class DatabaseService {
     String path = join(await getDatabasesPath(), 'mood_database.db');
     return await openDatabase(
       path,
-      version: 5, // Incremented version
+      version: 6,
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
     );
   }
-
-
 
   Future<void> _onCreate(Database db, int version) async {
     await db.execute('''
@@ -44,21 +42,21 @@ class DatabaseService {
         blendedColorHex TEXT,
         personName TEXT,
         userDescription TEXT,
-        userDominantEmotion TEXT
+        userDominantEmotion TEXT,
+        allEmotionScores TEXT
       )
     ''');
 
     await db.execute('''
-  CREATE TABLE people(
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT UNIQUE
-  )
-''');
+      CREATE TABLE people(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT UNIQUE
+      )
+    ''');
 
     await db.insert('people', {'name': 'You - Main User'});
   }
 
-  // Handle adding columns for existing users
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
     if (oldVersion < 2) {
       await db.execute('ALTER TABLE moods ADD COLUMN secondEmotion TEXT');
@@ -68,16 +66,6 @@ class DatabaseService {
     }
 
     if (oldVersion < 3) {
-      // Handle potential existing contextName column from previous development iterations
-      try {
-        await db.execute('ALTER TABLE moods ADD COLUMN personName TEXT');
-      } catch (_) {}
-      await db.execute('ALTER TABLE moods ADD COLUMN userDescription TEXT');
-      await db.execute('ALTER TABLE moods ADD COLUMN userDominantEmotion TEXT');
-    }
-
-    if (oldVersion < 4) {
-      // Explicitly ensure personName exists in version 4
       try {
         await db.execute('ALTER TABLE moods ADD COLUMN personName TEXT');
       } catch (_) {}
@@ -85,18 +73,17 @@ class DatabaseService {
         await db.execute('ALTER TABLE moods ADD COLUMN userDescription TEXT');
       } catch (_) {}
       try {
-        await db.execute(
-            'ALTER TABLE moods ADD COLUMN userDominantEmotion TEXT');
+        await db.execute('ALTER TABLE moods ADD COLUMN userDominantEmotion TEXT');
       } catch (_) {}
     }
 
     if (oldVersion < 5) {
       await db.execute('''
-    CREATE TABLE IF NOT EXISTS people(
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      name TEXT UNIQUE
-    )
-  ''');
+        CREATE TABLE IF NOT EXISTS people(
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          name TEXT UNIQUE
+        )
+      ''');
 
       await db.insert(
         'people',
@@ -104,25 +91,27 @@ class DatabaseService {
         conflictAlgorithm: ConflictAlgorithm.ignore,
       );
     }
+
+    if (oldVersion < 6) {
+      try {
+        await db.execute('ALTER TABLE moods ADD COLUMN allEmotionScores TEXT');
+      } catch (_) {}
+    }
   }
 
   Future<List<String>> getPeople() async {
     final db = await database;
-
     final result = await db.query(
       'people',
       orderBy: 'name ASC',
     );
-
     return result.map((row) => row['name'] as String).toList();
   }
 
   Future<void> addPerson(String name) async {
     final db = await database;
-
     final cleanName = name.trim();
     if (cleanName.isEmpty) return;
-
     await db.insert(
       'people',
       {'name': cleanName},
@@ -130,35 +119,14 @@ class DatabaseService {
     );
   }
 
-
-  /*Future<void> _addColumnIfMissing(
-      Database db,
-      String tableName,
-      String columnName,
-      String columnType,
-      ) async {
-    final columns = await db.rawQuery('PRAGMA table_info($tableName)');
-    final exists = columns.any((column) => column['name'] == columnName);
-
-    if (!exists) {
-      await db.execute(
-        'ALTER TABLE $tableName ADD COLUMN $columnName $columnType',
-      );
-    }
-  }*/
-
-
   Future<int> insertMood(MoodRecord record) async {
     final db = await database;
     return await db.insert('moods', record.toMap());
   }
 
-
-
   Future<List<MoodRecord>> getAllMoods() async {
     final db = await database;
     final List<Map<String, dynamic>> maps = await db.query('moods', orderBy: 'timestamp DESC');
-
     return List.generate(maps.length, (i) {
       return MoodRecord.fromMap(maps[i]);
     });
@@ -166,16 +134,12 @@ class DatabaseService {
 
   Future<void> clearAllMoods() async {
     final db = await database;
-
     await db.delete('moods');
-
     await syncPeopleWithMoods();
   }
 
-
   Future<void> cleanUnusedPeople() async {
     final db = await database;
-
     await db.delete(
       'people',
       where: '''
@@ -189,16 +153,13 @@ class DatabaseService {
 
   Future<void> syncPeopleWithMoods() async {
     final db = await database;
-
     await db.transaction((txn) async {
       await txn.delete('people');
-
       await txn.insert(
         'people',
         {'name': 'You - Main User'},
         conflictAlgorithm: ConflictAlgorithm.ignore,
       );
-
       final rows = await txn.rawQuery('''
       SELECT DISTINCT personName 
       FROM moods 
@@ -206,10 +167,8 @@ class DatabaseService {
       AND TRIM(personName) != ''
       AND personName != 'You - Main User'
     ''');
-
       for (final row in rows) {
         final name = row['personName'] as String;
-
         await txn.insert(
           'people',
           {'name': name},
@@ -221,12 +180,10 @@ class DatabaseService {
 
   Future<void> deleteMood(int id) async {
     final db = await database;
-
     await db.delete(
       'moods',
       where: 'id = ?',
       whereArgs: [id],
     );
   }
-
 }

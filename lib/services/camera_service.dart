@@ -1,4 +1,5 @@
 import 'package:camera/camera.dart';
+import 'package:flutter/foundation.dart';
 
 class CameraService {
   static Future<CameraController?> initializeCamera() async {
@@ -19,7 +20,7 @@ class CameraService {
       await controller.initialize();
       return controller;
     } catch (e) {
-      print('Error initializing camera: $e');
+      debugPrint('Error initializing camera: $e');
       return null;
     }
   }

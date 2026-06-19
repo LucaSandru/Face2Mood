@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+
 class MoodRecord {
   final int? id;
   final DateTime timestamp;
@@ -16,6 +19,8 @@ class MoodRecord {
   final String? userDescription;
   final String? userDominantEmotion;
 
+  final Map<String, double>? allEmotionScores;
+
   MoodRecord({
     this.id,
     required this.timestamp,
@@ -29,6 +34,8 @@ class MoodRecord {
     this.personName,
     this.userDescription,     // not needed 'required' since the user maybe not press 'Save to Stats' button
     this.userDominantEmotion,
+
+    this.allEmotionScores,
   });
 
   Map<String, dynamic> toMap() {
@@ -45,6 +52,10 @@ class MoodRecord {
       'personName': personName,
       'userDescription': userDescription,
       'userDominantEmotion': userDominantEmotion,
+
+      'allEmotionScores': allEmotionScores == null
+          ? null
+          : jsonEncode(allEmotionScores),
     };
   }
 
@@ -62,6 +73,14 @@ class MoodRecord {
       personName: map['personName'],
       userDescription: map['userDescription'],
       userDominantEmotion: map ['userDominantEmotion'],
+
+      allEmotionScores: map['allEmotionScores'] == null
+          ? null
+          : Map<String, double>.from(
+        jsonDecode(map['allEmotionScores']).map(
+              (key, value) => MapEntry(key, (value as num).toDouble()),
+        ),
+      ),
     );
   }
 }
