@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 
 import 'reset_filters_button.dart';
 
+
+/// Provides filtering controls for the statistics screen,
+/// allowing the user to filter by person, time range, and statistic type.
 class StatsFilterBar extends StatelessWidget {
   final String selectedPerson;
   final String selectedTimeRange;
@@ -27,10 +30,13 @@ class StatsFilterBar extends StatelessWidget {
     required this.onResetFilters,
   });
 
+
+  /// Builds the complete filter panel shown above the charts.
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
+        // Person and time-range filters.
         Row(
           children: [
             Expanded(child: _buildUserFilter()),
@@ -39,6 +45,8 @@ class StatsFilterBar extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 8),
+
+        // Statistic type selector and filter reset action.
         Row(
           children: [
             Expanded(child: _buildStatisticTypeFilter()),
@@ -54,9 +62,14 @@ class StatsFilterBar extends StatelessWidget {
     );
   }
 
+
+  /// Dropdown menu used to filter statistics by person.
   Widget _buildUserFilter() {
+
     return PopupMenuButton<String>(
-      initialValue: selectedPerson,
+
+      // Displays all available people stored in the local database.
+    initialValue: selectedPerson,
       onSelected: onPersonChanged,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
@@ -101,7 +114,11 @@ class StatsFilterBar extends StatelessWidget {
     );
   }
 
+
+  /// Dropdown menu used to filter records by time period.
   Widget _buildDateFilter() {
+
+    // Available time ranges for filtering mood history.
     const Map<String, String> options = {
       'all': 'All time',
       '1 Day': '1 Day',
@@ -153,6 +170,8 @@ class StatsFilterBar extends StatelessWidget {
     );
   }
 
+
+  /// Dropdown menu used to select the statistics visualization mode.
   Widget _buildStatisticTypeFilter() {
     return PopupMenuButton<String>(
       initialValue: selectedStatisticType,
@@ -191,6 +210,8 @@ class StatsFilterBar extends StatelessWidget {
         ),
       ),
       itemBuilder: (BuildContext context) {
+
+        // Displays the available statistics supported by the application.
         return statisticTypes.map((String type) {
           return PopupMenuItem<String>(
             value: type,

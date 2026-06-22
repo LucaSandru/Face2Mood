@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+
+/// Displayed when the selected filters return no mood records.
 class EmptyFilterState extends StatelessWidget {
   const EmptyFilterState({super.key});
 
@@ -31,6 +33,8 @@ class EmptyFilterState extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 8),
+
+          // Suggests adjusting the active filters to find matching records.
           RichText(
             textAlign: TextAlign.center,
             text: const TextSpan(

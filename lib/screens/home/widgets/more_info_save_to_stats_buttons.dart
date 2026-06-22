@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+
+/// Action buttons displayed below the emotion results.
+/// Allows the user to view additional details and save the analysis to statistics.
 class ActionButtons extends StatelessWidget {
   final bool showMoreInfo;
   final bool isSaved;
@@ -23,6 +26,7 @@ class ActionButtons extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
         children: [
+          // Toggle additional information about the current prediction.
           Expanded(
             child: OutlinedButton(
               onPressed: onToggleInfo,
@@ -46,6 +50,8 @@ class ActionButtons extends StatelessWidget {
 
           const SizedBox(width: 12),
 
+
+          // 'Save to stats' or 'Unsave' the mood record from the local statistics database.
           Expanded(
             child: OutlinedButton(
               onPressed: isSaved ? onUnsave : onSave,

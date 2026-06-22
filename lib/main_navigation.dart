@@ -4,6 +4,9 @@ import 'screens/home/home_screen.dart';
 import 'screens/stats/stats_screen.dart';
 import 'screens/profile/profile_screen.dart';
 
+
+/// Main application navigation.
+/// Provides access to the Home, Stats, and Profile tabs.
 class MainNavigation extends StatefulWidget {
   const MainNavigation({super.key});
 
@@ -17,6 +20,8 @@ class _MainNavigationState extends State<MainNavigation> with SingleTickerProvid
   @override
   void initState() {
     super.initState();
+
+    // Controls navigation between the three main application tabs.
     _tabController = TabController(length: 3, vsync: this);
   }
 

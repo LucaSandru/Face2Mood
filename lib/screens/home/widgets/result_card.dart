@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../../services/model_service.dart';
 
+
+/// Displays the top predicted emotions together with their confidence scores.
 class ResultCard extends StatelessWidget {
   final List<EmotionScore> topResults;
   final String mainEmotion;
@@ -11,6 +13,8 @@ class ResultCard extends StatelessWidget {
     required this.mainEmotion,
   });
 
+
+  /// Formats emotion labels for user-friendly display.
   String _capitalize(String text) {
     if (text.isEmpty) return text;
     return text[0].toUpperCase() + text.substring(1).toLowerCase();
@@ -18,6 +22,8 @@ class ResultCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    // Display a placeholder message before any prediction is available.
     if (topResults.isEmpty) {
       return Container(
         width: double.infinity,
@@ -51,6 +57,7 @@ class ResultCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Display the dominant predicted emotion.
           Text(
             'You seem mostly: ${_capitalize(mainEmotion)}',
             style: const TextStyle(
@@ -61,6 +68,8 @@ class ResultCard extends StatelessWidget {
           ),
           const SizedBox(height: 18),
 
+
+          // Display confidence scores for the Top3 predicted emotions.
           ...topResults.map((emotion) {
             final percent = emotion.confidence * 100;
 

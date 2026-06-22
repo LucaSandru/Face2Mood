@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+
+/// Displays the title and description associated with the currently selected statistics visualization.
 class StatsHeader extends StatelessWidget {
   final String selectedStatisticType;
 
@@ -8,8 +10,12 @@ class StatsHeader extends StatelessWidget {
     required this.selectedStatisticType,
   });
 
+
+  /// Updates the header text according to the selected statistic type.
   @override
   Widget build(BuildContext context) {
+
+    // Default header used for the Average Emotion Signals chart.
     String title = 'Emotion Distribution';
     String subtitle = 'Percentages of your emotions over time';
 

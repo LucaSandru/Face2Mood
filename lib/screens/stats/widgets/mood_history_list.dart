@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../services/mood_record_service.dart';
+import '../../../services/mood_record.dart';
 import 'mood_recent_history_card.dart';
 
 class MoodHistoryList extends StatelessWidget {
@@ -12,6 +12,8 @@ class MoodHistoryList extends StatelessWidget {
   final Color Function(String? hex) getSafeColor;
   final String Function(String text) capitalize;
 
+
+  /// Displays the filtered mood history as a list of expandable mood cards.
   const MoodHistoryList({
     super.key,
     required this.history,
@@ -30,6 +32,8 @@ class MoodHistoryList extends StatelessWidget {
       physics: const NeverScrollableScrollPhysics(),
       itemCount: history.length,
       itemBuilder: (context, index) {
+
+        // Retrieve the mood record associated with the current list item.
         final record = history[index];
 
         return MoodHistoryCard(

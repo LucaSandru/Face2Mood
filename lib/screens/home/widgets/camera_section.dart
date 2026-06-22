@@ -4,6 +4,8 @@ import 'dart:typed_data';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 
+
+/// Displays either the live camera preview, the captured image, or a loading indicator while the camera is initializing.
 class CameraSection extends StatelessWidget {
   final Uint8List? capturedPreviewBytes;
   final bool isCameraInitialized;
@@ -18,6 +20,8 @@ class CameraSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    // Show the captured image after a successful prediction.
     if (capturedPreviewBytes != null) {
       return Container(
         height: 480,
@@ -44,6 +48,7 @@ class CameraSection extends StatelessWidget {
       );
     }
 
+    // Display a loading indicator until the camera becomes available.
     if (!isCameraInitialized || controller == null) {
       return Container(
         height: 360,
@@ -79,7 +84,10 @@ class CameraSection extends StatelessWidget {
         borderRadius: BorderRadius.circular(28),
         child: AspectRatio(
           aspectRatio: previewAspectRatio,
-          child: Transform(
+          child:
+
+          // Mirror the front-camera preview for a natural selfie experience.
+          Transform(
             alignment: Alignment.center,
             transform: Matrix4.rotationY(math.pi),
             child: CameraPreview(controller!),

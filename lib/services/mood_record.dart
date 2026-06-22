@@ -1,13 +1,13 @@
 import 'dart:convert';
 
 
+/// Data model representing a single emotion analysis record.
+/// Stores prediction results, user feedback, and detailed emotion scores.
 class MoodRecord {
   final int? id;
   final DateTime timestamp;
   final String primaryEmotion;
   final double confidence;
-  
-  // New fields for the other 2 percentages
   final String? secondEmotion;
   final double? secondConfidence;
   final String? thirdEmotion;
@@ -21,6 +21,7 @@ class MoodRecord {
 
   final Map<String, double>? allEmotionScores;
 
+  /// Creates a mood record that can be stored in the local database.
   MoodRecord({
     this.id,
     required this.timestamp,
@@ -32,12 +33,14 @@ class MoodRecord {
     required this.thirdConfidence,
     required this.blendedColorHex,
     this.personName,
-    this.userDescription,     // not needed 'required' since the user maybe not press 'Save to Stats' button
+    this.userDescription,
     this.userDominantEmotion,
 
     this.allEmotionScores,
   });
 
+
+  // Store the complete emotion distribution as JSON text.
   Map<String, dynamic> toMap() {
     return {
       'id': id,
@@ -52,13 +55,14 @@ class MoodRecord {
       'personName': personName,
       'userDescription': userDescription,
       'userDominantEmotion': userDominantEmotion,
-
       'allEmotionScores': allEmotionScores == null
           ? null
           : jsonEncode(allEmotionScores),
     };
   }
 
+
+  /// Reconstructs a MoodRecord() object from a database row.
   factory MoodRecord.fromMap(Map<String, dynamic> map) {
     return MoodRecord(
       id: map['id'],
@@ -74,6 +78,7 @@ class MoodRecord {
       userDescription: map['userDescription'],
       userDominantEmotion: map ['userDominantEmotion'],
 
+      // Restore the stored JSON string back into emotion-score values.
       allEmotionScores: map['allEmotionScores'] == null
           ? null
           : Map<String, double>.from(

@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 
 import '../../../services/model_service.dart';
 
+
+/// Displays the emotion prediction results as a color palette,
+/// together with interpretations, suggestions, and emotion meanings.
 class EmotionPaletteCard extends StatefulWidget {
   final List<EmotionScore> topResults;
   final Color Function(String emotion) emotionColor;
@@ -21,6 +24,8 @@ class EmotionPaletteCard extends StatefulWidget {
 }
 
 class _EmotionPaletteCardState extends State<EmotionPaletteCard> {
+
+  // Controls the visibility of expandable sections.
   bool _showFullLegend = false;
   bool _showInterpretation = false;
   bool _showSuggestion = false;
@@ -30,6 +35,8 @@ class _EmotionPaletteCardState extends State<EmotionPaletteCard> {
     return text[0].toUpperCase() + text.substring(1).toLowerCase();
   }
 
+
+  /// Short description associated with each emotion color.
   String _emotionMeaning(String emotion) {
     switch (emotion.toLowerCase()) {
       case 'angry':
@@ -51,6 +58,8 @@ class _EmotionPaletteCardState extends State<EmotionPaletteCard> {
     }
   }
 
+
+  /// Generates an interpretation (based on Top1 emotion)
   String _getInterpretation(String emotion) {
     switch (emotion.toLowerCase()) {
       case 'angry':
@@ -72,6 +81,8 @@ class _EmotionPaletteCardState extends State<EmotionPaletteCard> {
     }
   }
 
+
+  /// Generates a suggestion (based on Top1 emotion)
   String _getSuggestion(String emotion) {
     switch (emotion.toLowerCase()) {
       case 'angry':
@@ -93,6 +104,8 @@ class _EmotionPaletteCardState extends State<EmotionPaletteCard> {
     }
   }
 
+
+  /// Builds a single emotion legend entry used in the color meaning section.
   Widget _buildLegendItem(String label) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
@@ -135,14 +148,19 @@ class _EmotionPaletteCardState extends State<EmotionPaletteCard> {
     );
   }
 
+
   @override
   Widget build(BuildContext context) {
     if (widget.topResults.isEmpty) {
       return const SizedBox.shrink();
     }
 
+
+    // Extract Top3 emotions predicted by the model.
     final top3Labels = widget.topResults.take(3).map((e) => e.label).toList();
 
+
+    // Remaining emotions used when the full legend is expanded.
     final otherLabels = EmotionModelService.labels
         .where((label) => !top3Labels.contains(label))
         .toList();
@@ -173,6 +191,8 @@ class _EmotionPaletteCardState extends State<EmotionPaletteCard> {
 
           const SizedBox(height: 18),
 
+
+          // Visual representation of the top-3 emotions and the blended color result.
           Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -278,7 +298,7 @@ class _EmotionPaletteCardState extends State<EmotionPaletteCard> {
                     ),
                     const SizedBox(height: 6),
                     const Text(
-                      '(legend)',
+                      '(color palette)',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: Colors.white60,
@@ -296,6 +316,8 @@ class _EmotionPaletteCardState extends State<EmotionPaletteCard> {
           const Divider(color: Colors.white10, thickness: 1),
           const SizedBox(height: 8),
 
+
+          // Interpretation - Expandable explanation of the detected dominant emotion
           Center(
             child: TextButton.icon(
               onPressed: () {
@@ -335,6 +357,8 @@ class _EmotionPaletteCardState extends State<EmotionPaletteCard> {
               ),
             ),
 
+
+          // Suggestion - Expandable explanation of the detected dominant emotion
           Center(
             child: TextButton.icon(
               onPressed: () {
@@ -378,6 +402,8 @@ class _EmotionPaletteCardState extends State<EmotionPaletteCard> {
           const Divider(color: Colors.white10, thickness: 1),
           const SizedBox(height: 18),
 
+
+          // Displays the emotion-to-color mapping used throughout the application.
           const Text(
             'Color Meanings',
             style: TextStyle(

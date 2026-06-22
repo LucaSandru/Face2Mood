@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+
+/// Bottom sheet displaying usage instructions and recommendations for obtaining reliable emotion recognition results.
+/// Used as an introductory guide for first-time users.
 class TipsBottomSheet extends StatelessWidget {
   const TipsBottomSheet({super.key});
 

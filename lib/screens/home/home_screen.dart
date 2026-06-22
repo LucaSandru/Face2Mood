@@ -9,7 +9,7 @@ import '../../services/camera_service.dart';
 import '../../services/database_service.dart';
 import '../../services/face_detection_mlkit_service.dart';
 import '../../services/model_service.dart';
-import '../../services/mood_record_service.dart';
+import '../../services/mood_record.dart';
 import 'widgets/save_mood_details_sheet.dart';
 import 'widgets/result_card.dart';
 import 'widgets/prediction_status.dart';
@@ -20,6 +20,12 @@ import 'widgets/tips_start_app.dart';
 import 'widgets/more_info_save_to_stats_buttons.dart';
 
 
+/// Main application screen responsible for:
+/// - camera interaction,
+/// - face detection,
+/// - emotion prediction,
+/// - result visualization,
+/// - mood record storage.
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -28,7 +34,8 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-
+/// Coordinates the complete Face2Mood workflow:
+/// Camera → Face Detection → Emotion Recognition → Statistics Storage.
 class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin, AutomaticKeepAliveClientMixin  {
 
   @override
@@ -37,17 +44,20 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin, 
   CameraController? _controller;
   bool _isCameraInitialized = false;
 
-  final EmotionModelService _emotionModelService = EmotionModelService();  //class of model_service.dart
-  final FaceDetectionService _faceDetectionService = FaceDetectionService(); //class of facce_detection.dart
-  final DatabaseService _dbService = DatabaseService(); //class of database_service.dart
 
-  final GlobalKey _moreInfoSectionKey = GlobalKey();  // build-in class
+  // Core services used by the Home screen.
+  final EmotionModelService _emotionModelService = EmotionModelService();  // class of model_service.dart
+  final FaceDetectionService _faceDetectionService = FaceDetectionService(); // class of face_detection_mlkit_service.dart
+  final DatabaseService _dbService = DatabaseService(); // class of database_service.dart
+
+  final GlobalKey _moreInfoSectionKey = GlobalKey();  // build-in method
 
   final GlobalKey _statusTextKey = GlobalKey();
 
   final ScrollController _homeScrollController = ScrollController();
 
-  List<EmotionScore> _topResults = [];  // from model_service.dart (EmotionScore)
+  // Stores the latest prediction results and UI state.
+  List<EmotionScore> _topResults = [];
   bool _modelReady = false;
   bool _showMoreInfo = false;
 
@@ -73,8 +83,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin, 
     'surprise',
   ];
 
+  // Used for measuring on-device performance.
+  final List<int> _tfliteInferenceTimes = [];
+  final List<int> _fullPipelineTimes = [];
+
+
+  /// Initializes camera, model, and startup user guidance.
   @override
-  void initState() {   // lifecycle method, called just once when widget created
+  void initState() {
     super.initState();
     _initializeCamera().then((_) {
       _scrollToCameraInstructions();
@@ -87,13 +103,15 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin, 
 
   }
 
+
+  /// Initializes the front camera used for emotion analysis.
   Future<void> _initializeCamera() async {
-    _controller = await CameraService.initializeCamera();  //wait for camera to be initialized
+    _controller = await CameraService.initializeCamera();
 
     if (!mounted) return;
 
     if (_controller != null) {
-      setState(() => _isCameraInitialized = true);  // _isCameraInitialized become true, it was defined as false
+      setState(() => _isCameraInitialized = true);
     }
   }
 
@@ -128,6 +146,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin, 
   }
 
 
+  /// Collects additional user information before storing a mood record inside the local database.
   Future<void> _showSaveMoodDetailsSheet() async {
     if (_pendingRecord == null || _isSaved) return;
 
@@ -214,6 +233,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin, 
   }
 
 
+  /// Loads the TensorFlow Lite emotion recognition model.
   Future<void> _initModel() async {
     try {
       setState(() => _debugMessage = 'Loading model...');
@@ -227,6 +247,15 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin, 
     }
   }
 
+
+  /// Complete emotion recognition pipeline:
+  /// 1. Capture image
+  /// 2. Detect and crop face
+  /// 3. Validate image quality
+  /// 4. Run TensorFlow Lite inference
+  /// 5. Generate prediction results
+  /// 6. Prepare mood record
+  /// 7. Update the user interface
   Future<void> _captureAndPredict() async {
     try {
       if (_controller == null || !_controller!.value.isInitialized) {
@@ -235,6 +264,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin, 
         });
         return;
       }
+
+      final fullPipelineStopwatch = Stopwatch()..start();
 
       setState(() {
         _debugMessage = 'Capturing image...';
@@ -248,14 +279,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin, 
       });
 
 
-      final detectionResult =
-      await _faceDetectionService.detectAndCropLargestFace(bytes);
+      // Detect, validate, and crop the largest visible face.
+      final detectionResult =  await _faceDetectionService.detectAndCropLargestFace(bytes);
 
 
       if (detectionResult.image == null) {
         setState(() {
           _capturedPreviewBytes = bytes;
-          // Display the actual error message from the service
           _debugMessage = detectionResult.error ?? 'No face detected. Try again.';
           _hasError = true;
           _topResults = [];
@@ -283,11 +313,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin, 
       });
 
 
+      // Run emotion recognition using the TensorFlow Lite model.
       final results = _emotionModelService.predictFromImage(detectionResult.image!);
 
-      // Prepare the record but DON'T save yet
       _topResults = results.take(3).toList();
       final blendedColor = _calculateBlendedColor();
+
+      // Prepare a mood record that can later be saved to SQLite.
       final record = MoodRecord(
         timestamp: DateTime.now(),
         primaryEmotion: results[0].label,
@@ -310,6 +342,17 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin, 
         _lastSavedMoodId = null;
       });
 
+      fullPipelineStopwatch.stop();
+
+      final tfliteTimeMs = _emotionModelService.lastInferenceTimeMs;
+
+      if (tfliteTimeMs != null) {
+        _logPerformanceSummary(
+          tfliteTimeMs: tfliteTimeMs,
+          fullPipelineTimeMs: fullPipelineStopwatch.elapsedMilliseconds,
+        );
+      }
+
     } catch (e) {
       setState(() {
         _debugMessage = 'Error: $e';
@@ -319,29 +362,31 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin, 
     _scrollToPredictionResult();
   }
 
+
+  /// Maps each emotion to its corresponding application color.
   Color _emotionColor(String emotion) {
     switch (emotion.toLowerCase()) {
       case 'happy':
-        return const Color(0xFF4CAF50); // Green
+        return const Color(0xFF4CAF50);
       case 'neutral':
-        return const Color(0xFFF1C40F); // Yellow
+        return const Color(0xFFF1C40F);
       case 'sad':
-        return const Color(0xFF3498DB); // Blue
+        return const Color(0xFF3498DB);
       case 'angry':
-        return const Color(0xFFE74C3C); // Red
+        return const Color(0xFFE74C3C);
       case 'fear':
-        return const Color(0xFF8E44AD); // Purple
+        return const Color(0xFF8E44AD);
       case 'disgust':
-        return const Color(0xFF6B8E23); // Olive Green
+        return const Color(0xFF6B8E23);
       case 'surprise':
-        return const Color(0xFFE67E22); // Orange
+        return const Color(0xFFE67E22);
       default:
         return Colors.grey;
     }
   }
 
 
-
+  /// Calculates image brightness to reject extremely dark captures.
   double _calculateMeanIntensity(img.Image image){
     double totalIntensity = 0;
     for (final pixel in image){
@@ -352,8 +397,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin, 
 
 
 
-
-  Color _calculateBlendedColor() {   // calculate the blending for pallete
+  /// Generates a blended color representation using the Top-3 predicted emotions and their confidence scores.
+  Color _calculateBlendedColor() {
     if (_topResults.isEmpty) return Colors.grey;
 
     double totalConfidence = 0;
@@ -395,6 +440,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin, 
   }
 
 
+  /// Displays feedback messages for save, delete,
+  /// and validation operations.
   void _showMoodSnackBar(String message, {Color backgroundColor = Colors.green}) {
     if (!mounted) return;
 
@@ -435,8 +482,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin, 
   }
 
 
-
-
+  /// Removes the previously saved mood record from statistics.
   Future<void> _unsaveFromStats() async {
     if (!_isSaved || _lastSavedMoodId == null) return;
 
@@ -461,6 +507,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin, 
   }
 
 
+  /// Displays the usage guide shown at application startup and through the information button.
   void _showTipsSheet() {
     showModalBottomSheet(
       context: context,
@@ -475,6 +522,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin, 
   }
 
 
+  /// Resets the current prediction and returns the screen to its initial state.
   void _clearResult() {
     setState(() {
       _capturedPreviewBytes = null;
@@ -499,6 +547,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin, 
     super.dispose();
   }
 
+
+  /// Builds the Home screen user interface.
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -582,4 +632,29 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin, 
       ),
     );
   }
+
+
+  /// Collects and prints TensorFlow Lite inference time and full prediction pipeline performance metrics.
+  void _logPerformanceSummary({
+    required int tfliteTimeMs,
+    required int fullPipelineTimeMs,
+  }) {
+    _tfliteInferenceTimes.add(tfliteTimeMs);
+    _fullPipelineTimes.add(fullPipelineTimeMs);
+
+    final avgTflite = _tfliteInferenceTimes.reduce((a, b) => a + b) /
+        _tfliteInferenceTimes.length;
+
+    final avgPipeline = _fullPipelineTimes.reduce((a, b) => a + b) /
+        _fullPipelineTimes.length;
+
+    debugPrint('--- Face2Mood Performance Summary ---');
+    debugPrint('Successful predictions: ${_tfliteInferenceTimes.length}');
+    debugPrint('Latest TFLite inference: $tfliteTimeMs ms');
+    debugPrint('Average TFLite inference: ${avgTflite.toStringAsFixed(2)} ms');
+    debugPrint('Latest full pipeline: $fullPipelineTimeMs ms');
+    debugPrint('Average full pipeline: ${avgPipeline.toStringAsFixed(2)} ms');
+    debugPrint('-------------------------------------');
+  }
+
 }

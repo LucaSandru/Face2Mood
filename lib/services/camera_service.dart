@@ -1,6 +1,8 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/foundation.dart';
 
+/// Handles initialization of the device camera.
+/// Automatically selects the front camera when available.
 class CameraService {
   static Future<CameraController?> initializeCamera() async {
     try {

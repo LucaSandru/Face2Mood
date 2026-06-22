@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+
+/// Button used to restore the default statistics filters.
 class ResetFiltersButton extends StatelessWidget {
   final VoidCallback onReset;
 

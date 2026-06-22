@@ -1,8 +1,13 @@
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
-import 'mood_record_service.dart';
+import 'mood_record.dart';
 
+
+/// Handles all local SQLite database operations used by Face2Mood.
+/// Stores mood records, user/person names, and manages database migrations.
 class DatabaseService {
+
+  // Singleton instance used to avoid opening multiple database connections.
   static final DatabaseService _instance = DatabaseService._internal();
   static Database? _database;
 
@@ -12,12 +17,14 @@ class DatabaseService {
 
   DatabaseService._internal();
 
+  /// Returns the existing database connection or initializes it if needed.
   Future<Database> get database async {
     if (_database != null) return _database!;
     _database = await _initDatabase();
     return _database!;
   }
 
+  /// Opens the local SQLite database and applies creation or migration logic.
   Future<Database> _initDatabase() async {
     String path = join(await getDatabasesPath(), 'mood_database.db');
     return await openDatabase(
@@ -28,6 +35,7 @@ class DatabaseService {
     );
   }
 
+  /// Creates the initial database structure for mood records and saved people.
   Future<void> _onCreate(Database db, int version) async {
     await db.execute('''
       CREATE TABLE moods(
@@ -57,7 +65,10 @@ class DatabaseService {
     await db.insert('people', {'name': 'You - Main User'});
   }
 
+  /// Handles database schema upgrades when new fields are added in later versions.
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
+
+    // Version 2 introduced storage for the second and third predicted emotions.
     if (oldVersion < 2) {
       await db.execute('ALTER TABLE moods ADD COLUMN secondEmotion TEXT');
       await db.execute('ALTER TABLE moods ADD COLUMN secondConfidence REAL');
@@ -65,6 +76,7 @@ class DatabaseService {
       await db.execute('ALTER TABLE moods ADD COLUMN thirdConfidence REAL');
     }
 
+    // Version 3 introduced user-provided mood context and selected emotion.
     if (oldVersion < 3) {
       try {
         await db.execute('ALTER TABLE moods ADD COLUMN personName TEXT');
@@ -77,6 +89,7 @@ class DatabaseService {
       } catch (_) {}
     }
 
+    // Version 5 introduced the people table used for person filtering.
     if (oldVersion < 5) {
       await db.execute('''
         CREATE TABLE IF NOT EXISTS people(
@@ -92,6 +105,7 @@ class DatabaseService {
       );
     }
 
+    // Version 6 introduced full emotion-score storage for all seven emotions.
     if (oldVersion < 6) {
       try {
         await db.execute('ALTER TABLE moods ADD COLUMN allEmotionScores TEXT');
@@ -99,6 +113,8 @@ class DatabaseService {
     }
   }
 
+
+  /// Returns all saved people names, ordered alphabetically.
   Future<List<String>> getPeople() async {
     final db = await database;
     final result = await db.query(
@@ -108,6 +124,8 @@ class DatabaseService {
     return result.map((row) => row['name'] as String).toList();
   }
 
+
+  /// Adds a new person name if it is not empty and does not already exist.
   Future<void> addPerson(String name) async {
     final db = await database;
     final cleanName = name.trim();
@@ -119,11 +137,15 @@ class DatabaseService {
     );
   }
 
+
+  /// Inserts a new mood record and returns its generated database ID.
   Future<int> insertMood(MoodRecord record) async {
     final db = await database;
     return await db.insert('moods', record.toMap());
   }
 
+
+  /// Retrieves all mood records ordered from newest to oldest.
   Future<List<MoodRecord>> getAllMoods() async {
     final db = await database;
     final List<Map<String, dynamic>> maps = await db.query('moods', orderBy: 'timestamp DESC');
@@ -132,12 +154,16 @@ class DatabaseService {
     });
   }
 
+
+  /// Deletes all mood records and refreshes the people table.
   Future<void> clearAllMoods() async {
     final db = await database;
     await db.delete('moods');
     await syncPeopleWithMoods();
   }
 
+
+  /// Removes people that are no longer associated with any mood record.
   Future<void> cleanUnusedPeople() async {
     final db = await database;
     await db.delete(
@@ -151,6 +177,8 @@ class DatabaseService {
     );
   }
 
+
+  /// Rebuilds the people table based on names currently used in mood records.
   Future<void> syncPeopleWithMoods() async {
     final db = await database;
     await db.transaction((txn) async {
@@ -178,6 +206,8 @@ class DatabaseService {
     });
   }
 
+
+  /// Deletes a single mood record by its database ID.
   Future<void> deleteMood(int id) async {
     final db = await database;
     await db.delete(

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'main_navigation.dart';
 
+
+/// Application entry point.
+/// Initializes the Face2Mood app and loads the main navigation interface.
 void main() {
   runApp(const MyApp());
 }

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+
+/// Displays prediction status messages and highlights success or error states.
 class StatusText extends StatelessWidget {
   final String message;
   final bool hasError;

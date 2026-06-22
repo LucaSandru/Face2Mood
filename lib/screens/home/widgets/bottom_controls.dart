@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+
+/// Bottom action bar displayed on the Home screen. Provides actions to 'info button', 'capture button' , and 'retry button'.
 class BottomControls extends StatelessWidget {
   final bool modelReady;
   final bool hasCapturedPreview;
@@ -23,6 +25,7 @@ class BottomControls extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
+          // 'Info button' - button displaying tips on how to use the app
           GestureDetector(
             onTap: onShowTips,
             child: Container(
@@ -43,6 +46,7 @@ class BottomControls extends StatelessWidget {
 
           Column(
             children: [
+              // 'Capture button' - Main action button used to trigger emotion analysis
               GestureDetector(
                 onTap: (modelReady && !hasCapturedPreview) ? onCapture : null,
                 child: Container(
@@ -68,6 +72,8 @@ class BottomControls extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 10),
+
+              // Display the current application state to the user.
               Text(
                 !modelReady
                     ? 'Model loading...'
@@ -83,6 +89,7 @@ class BottomControls extends StatelessWidget {
             ],
           ),
 
+          // 'Retry button' - button to retry emotion analysis.
           GestureDetector(
             onTap: onRetry,
             child: Container(

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+
+/// Displayed when no mood records have been saved yet.
 class EmptyStatsState extends StatelessWidget {
   const EmptyStatsState({super.key});
 

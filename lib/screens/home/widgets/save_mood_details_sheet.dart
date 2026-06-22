@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+
+/// Stores the additional information provided by the user before a mood record is saved to SQLite local database.
 class MoodSaveDetails {
   final String personName;
   final String? userDescription;
@@ -12,6 +14,8 @@ class MoodSaveDetails {
   });
 }
 
+
+/// Bottom sheet used to collect additional mood information: person, description, and user-selected emotion.
 class SaveMoodDetailsSheet extends StatefulWidget {
   final List<String> people;
   final List<String> emotionOptions;
@@ -29,6 +33,8 @@ class SaveMoodDetailsSheet extends StatefulWidget {
 }
 
 class _SaveMoodDetailsSheetState extends State<SaveMoodDetailsSheet> {
+
+  // Controllers used for description and custom person input.
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _newPersonController = TextEditingController();
 
@@ -41,6 +47,8 @@ class _SaveMoodDetailsSheetState extends State<SaveMoodDetailsSheet> {
   int _wordCount = 0;
   bool _personError = false;
 
+
+  /// Initializes the default selected person.
   @override
   void initState() {
     super.initState();
@@ -56,6 +64,8 @@ class _SaveMoodDetailsSheetState extends State<SaveMoodDetailsSheet> {
     super.dispose();
   }
 
+
+  /// Counts the number of words entered in the description field.
   int _countWords(String text) {
     int count = 0;
 
@@ -66,11 +76,14 @@ class _SaveMoodDetailsSheetState extends State<SaveMoodDetailsSheet> {
     return count;
   }
 
+
+  /// Validates the user input and returns the collected information to the Home screen if all fields are valid.
   void _confirmSave() {
     final finalPersonName = _addingNewPerson
         ? _newPersonController.text.trim()
         : _selectedPerson;
 
+    // Prevent saving without a valid person name.
     if (finalPersonName.isEmpty) {
       setState(() {
         _personError = true;
@@ -78,6 +91,7 @@ class _SaveMoodDetailsSheetState extends State<SaveMoodDetailsSheet> {
       return;
     }
 
+    // Prevent saving until the user selects a believed emotion.
     if (_selectedEmotion == null) {
       setState(() {
         _emotionError = true;
@@ -85,6 +99,7 @@ class _SaveMoodDetailsSheetState extends State<SaveMoodDetailsSheet> {
       return;
     }
 
+    // Return the completed mood details object to the caller.
     Navigator.of(context).pop(
       MoodSaveDetails(
         personName: finalPersonName,
@@ -96,6 +111,8 @@ class _SaveMoodDetailsSheetState extends State<SaveMoodDetailsSheet> {
     );
   }
 
+
+  /// Reusable pill-shaped selection widget used for people names and emotion options.
   Widget _selectablePill({
     required String label,
     required bool selected,
@@ -126,6 +143,7 @@ class _SaveMoodDetailsSheetState extends State<SaveMoodDetailsSheet> {
       ),
     );
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -164,6 +182,7 @@ class _SaveMoodDetailsSheetState extends State<SaveMoodDetailsSheet> {
 
             const SizedBox(height: 20),
 
+            // Select an existing person or create a new one.
             const Text(
               'Person',
               style: TextStyle(
@@ -241,6 +260,7 @@ class _SaveMoodDetailsSheetState extends State<SaveMoodDetailsSheet> {
 
             const SizedBox(height: 14),
 
+            // Optional contextual description associated with this mood record.
             TextField(
               controller: _descriptionController,
               maxLines: 3,
@@ -276,6 +296,7 @@ class _SaveMoodDetailsSheetState extends State<SaveMoodDetailsSheet> {
 
             const SizedBox(height: 14),
 
+            // User self-assessment of believed dominant emotion
             const Text(
               'Your believed dominant emotion',
               style: TextStyle(
@@ -322,6 +343,8 @@ class _SaveMoodDetailsSheetState extends State<SaveMoodDetailsSheet> {
 
             const SizedBox(height: 22),
 
+
+            // Final actions: cancel or save the mood record.
             Row(
               children: [
                 Expanded(

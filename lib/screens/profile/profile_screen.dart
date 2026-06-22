@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../../services/database_service.dart';
 
 
+/// Profile and application information screen.
+/// Displays privacy, app information, and local data controls.
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
@@ -14,8 +16,11 @@ class _ProfileScreenState extends State<ProfileScreen>
   @override
   bool get wantKeepAlive => true;
 
+  // Database service used only for clearing locally stored mood records.
   final DatabaseService _dbService = DatabaseService();
 
+
+  /// Shows a confirmation pop-up before permanently deleting all mood records.
   void _clearData() async {
     showDialog(
       context: context,
@@ -57,6 +62,7 @@ class _ProfileScreenState extends State<ProfileScreen>
     );
   }
 
+  /// Builds a reusable section title for profile information groups.
   Widget _buildSectionTitle(String title, Color color) {
     return Text(
       title,
@@ -68,6 +74,8 @@ class _ProfileScreenState extends State<ProfileScreen>
     );
   }
 
+
+  /// Builds a reusable card container for grouped profile information.
   Widget _buildCard({required List<Widget> children}) {
     return Container(
       padding: const EdgeInsets.all(16),

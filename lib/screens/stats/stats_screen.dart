@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../services/database_service.dart';
-import '../../services/mood_record_service.dart';
+import '../../services/mood_record.dart';
 import 'widgets/stats_header.dart';
 import 'widgets/empty_stats_state.dart';
 import 'widgets/empty_filter_state.dart';
@@ -8,6 +8,9 @@ import 'widgets/stats_filter_bar.dart';
 import 'widgets/pie_chart.dart';
 import 'widgets/mood_history_list.dart';
 
+
+/// Statistics dashboard displaying mood history, emotion analytics,
+/// filtering options, and user-model agreement information.
 class StatsScreen extends StatefulWidget {
   const StatsScreen({super.key});
 
@@ -15,34 +18,49 @@ class StatsScreen extends StatefulWidget {
   State<StatsScreen> createState() => _StatsScreenState();
 }
 
+
+/// Manages mood data loading, filtering, statistics generation,
+/// and visualization within the Statistics tab.
 class _StatsScreenState extends State<StatsScreen> with AutomaticKeepAliveClientMixin {
   @override
   bool get wantKeepAlive => true;
 
+
+  // Local database used to retrieve and manage stored mood records.
   final DatabaseService _dbService = DatabaseService();
+
+  // Current filtered mood records and chart visualization data.
   List<MoodRecord> _history = [];
   Map<String, double> _chartData = {};
   bool _isLoading = true;
 
+  // Tracks which mood history cards are currently expanded.
   final Set<int> _expandedItems = {};
 
+  // Active statistics filters selected by the user.
   String _selectedPerson = 'All';
   String _selectedTimeRange = 'all';
   List<String> _availablePeople = ['All'];
 
   String _selectedStatisticType = 'Average Signals';
+
+  // Supported analytics modes available in the statistics dashboard.
   final List<String> _statisticTypes = [
     'Average Signals',
     'Top Prediction Count',
     'User vs Model Agreement',
   ];
 
+
+  /// Loads mood data when the Statistics screen is opened.
   @override
   void initState() {
     super.initState();
     _loadData();
   }
 
+
+  /// Restores all filters to their default values.
   void _resetFilters() {
     setState(() {
       _selectedPerson = 'All';
@@ -54,12 +72,15 @@ class _StatsScreenState extends State<StatsScreen> with AutomaticKeepAliveClient
   }
 
 
+  /// Formats emotion labels for display.
   String _capitalize(String text) {
     if (text.isEmpty) return text;
     if (text.length < 2) return text.toUpperCase();
     return text[0].toUpperCase() + text.substring(1).toLowerCase();
   }
 
+
+  /// Loads mood records from the database, applies filters, and prepares the data required for statistics generation.
   void _loadData() async {
     try {
       setState(() => _isLoading = true);
@@ -75,6 +96,7 @@ class _StatsScreenState extends State<StatsScreen> with AutomaticKeepAliveClient
         return;
       }
 
+      // Build the list of available people from stored mood records.
       final names = allHistory
           .map((e) => e.personName)
           .where((name) => name != null && name.isNotEmpty)
@@ -85,6 +107,8 @@ class _StatsScreenState extends State<StatsScreen> with AutomaticKeepAliveClient
       List<String> updatedPeopleList = ['All', ...names];
 
       final now = DateTime.now();
+
+      // Apply person, time-range, and statistic-specific filters.
       final filteredHistory = allHistory.where((record) {
         bool matchesPerson = (_selectedPerson == 'All' ||
             record.personName == _selectedPerson);
@@ -111,6 +135,8 @@ class _StatsScreenState extends State<StatsScreen> with AutomaticKeepAliveClient
         return matchesPerson && matchesTime && matchesType;
       }).toList();
 
+
+      // No records satisfy the current filters.
       if (filteredHistory.isEmpty) {
         setState(() {
           _history = [];
@@ -137,6 +163,8 @@ class _StatsScreenState extends State<StatsScreen> with AutomaticKeepAliveClient
     }
   }
 
+
+  /// Selects the appropriate statistics calculation method based on the currently selected analytics mode.
   void _processStatistics(List<MoodRecord> filteredRecords) {
     if (_selectedStatisticType == 'Average Signals') {
       _calculateAverageSignals(filteredRecords);
@@ -147,17 +175,22 @@ class _StatsScreenState extends State<StatsScreen> with AutomaticKeepAliveClient
     }
   }
 
+  /// Calculates cumulative emotion signals using either all stored emotion scores or the available top-3 predictions.
   void _calculateAverageSignals(List<MoodRecord> records) {
     Map<String, double> weights = {};
 
+    // Aggregate emotion contributions from each stored mood record.
     for (var record in records) {
       if (record.allEmotionScores != null && record.allEmotionScores!.isNotEmpty) {
-        // New logic: Use all 7 emotion classes
+
+        // New records contain confidence values for all seven emotions.
         record.allEmotionScores!.forEach((emotion, score) {
           weights[emotion] = (weights[emotion] ?? 0) + score;
         });
-      } else {
-        // Fallback for older records (Top-3 only)
+      }
+
+      // Fallback for older records containing only top-3 predictions.
+      else {
         weights[record.primaryEmotion] =
             (weights[record.primaryEmotion] ?? 0) + record.confidence;
         if (record.secondEmotion != null && record.secondConfidence != null) {
@@ -171,7 +204,7 @@ class _StatsScreenState extends State<StatsScreen> with AutomaticKeepAliveClient
       }
     }
 
-    // Sort chart data so legend is consistent or by value
+    // Sort emotions by importance for a consistent chart legend.
     var sortedEntries = weights.entries.toList()
       ..sort((a, b) => b.value.compareTo(a.value));
     
@@ -180,6 +213,8 @@ class _StatsScreenState extends State<StatsScreen> with AutomaticKeepAliveClient
     });
   }
 
+
+  /// Counts how frequently each emotion appears as the primary prediction.
   void _calculateTopPredictionStats(List<MoodRecord> records) {
     Map<String, double> counts = {};
     for (var record in records) {
@@ -191,6 +226,8 @@ class _StatsScreenState extends State<StatsScreen> with AutomaticKeepAliveClient
     });
   }
 
+
+  /// Measures agreement between the user's selected emotion and the model's top-3 predictions.
   void _calculateAgreementStats(List<MoodRecord> records) {
     double agreement = 0;
     double partialAgreement = 0;
@@ -206,11 +243,16 @@ class _StatsScreenState extends State<StatsScreen> with AutomaticKeepAliveClient
         final top2 = record.secondEmotion?.toLowerCase().trim();
         final top3 = record.thirdEmotion?.toLowerCase().trim();
 
+        // Exact agreement with the primary model prediction.
         if (user == top1) {
           agreement += 1.0;
+
+          // Partial agreement with secondary predictions.
         } else if (user == top2 || user == top3) {
           partialAgreement += 1.0;
-        } else {
+        }
+        // disagreement with model prediction
+        else {
           disagreement += 1.0;
         }
       }
@@ -225,6 +267,8 @@ class _StatsScreenState extends State<StatsScreen> with AutomaticKeepAliveClient
     });
   }
 
+
+  /// Maps emotions to their associated visualization colors.
   Color _getEmotionColor(String emotion) {
     if (emotion.isEmpty) return Colors.grey;
     switch (emotion.toLowerCase().trim()) {
@@ -251,6 +295,8 @@ class _StatsScreenState extends State<StatsScreen> with AutomaticKeepAliveClient
     }
   }
 
+
+  /// Builds the complete Statistics dashboard interface.
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -282,6 +328,8 @@ class _StatsScreenState extends State<StatsScreen> with AutomaticKeepAliveClient
             if (_history.isEmpty)
               const EmptyFilterState()
             else
+
+            // Visual representation of the currently selected statistics.
               StatsPieChart(
                 chartData: _chartData,
                 getEmotionColor: _getEmotionColor,
@@ -289,6 +337,8 @@ class _StatsScreenState extends State<StatsScreen> with AutomaticKeepAliveClient
               ),
 
             const SizedBox(height: 32),
+
+            // Filtering controls affecting statistics and history records.
             StatsFilterBar(
               selectedPerson: _selectedPerson,
               selectedTimeRange: _selectedTimeRange,
@@ -341,6 +391,8 @@ class _StatsScreenState extends State<StatsScreen> with AutomaticKeepAliveClient
               ],
             ),
             const SizedBox(height: 16),
+
+            // List of mood records matching the selected filters.
             MoodHistoryList(
               history: _history,
               expandedItems: _expandedItems,
@@ -357,6 +409,7 @@ class _StatsScreenState extends State<StatsScreen> with AutomaticKeepAliveClient
   }
 
 
+  /// Expands or collapses an individual mood history card.
   void _toggleExpandedItem(int index) {
     setState(() {
       if (_expandedItems.contains(index)) {
@@ -367,6 +420,8 @@ class _StatsScreenState extends State<StatsScreen> with AutomaticKeepAliveClient
     });
   }
 
+
+  /// Safely converts a stored hexadecimal color into a Flutter Color.
   Color _getSafeColor(String? hex) {
     try {
       if (hex == null || hex.isEmpty || !hex.contains('#'))
@@ -378,6 +433,7 @@ class _StatsScreenState extends State<StatsScreen> with AutomaticKeepAliveClient
   }
 
 
+  /// Deletes a mood record and refreshes the statistics dashboard.
   Future<void> _deleteMoodRecord(MoodRecord record) async {
     if (record.id == null) return;
 
