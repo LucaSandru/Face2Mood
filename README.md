@@ -1,52 +1,52 @@
-# 😊 Face2Mood: On-Device Emotional Intelligence
-**A BSc Computer Science Thesis Project**
+# Face2Mood: Mobile Emotion Recognition System
 
-Face2Mood is a lightweight Android application for real-time **Facial Emotion Recognition (FER)** using Flutter, Google ML Kit, TensorFlow Lite, and SQLite. The project demonstrates a privacy-first approach to mobile emotion recognition without external server communication.
+Face2Mood is a lightweight Android application for real-time **Facial Emotion Recognition** (FER) developed using _Flutter, Google ML Kit, TensorFlow Lite_, and _SQLite_. The application performs automatic face detection, facial emotion recognition, local mood tracking, and statistical visualization entirely on-device, eliminating the need for cloud-based processing while preserving user privacy.
 
 ---
 
-## 📌 Project Context
+## Project Context
 
 This project was developed as part of a Bachelor's Thesis in Computer Science at the **West University of Timișoara**.
 
-The main objective was to design and implement a complete mobile Facial Emotion Recognition system capable of running directly on Android devices without external server communication, adhering to strict privacy-by-design principles and demonstrating practical deep learning deployment on resource-constrained mobile hardware.
+The objective of the project was to design, implement, and evaluate a complete mobile Facial Emotion Recognition system capable of performing real-time emotion analysis directly on Android smartphones. The proposed solution combines a lightweight Deep Learning model based on the **RS-Xception** architecture with Google ML Kit for face detection and TensorFlow Lite for efficient on-device inference. All emotion recognition operations are executed locally, ensuring low computational requirements and maintaining user privacy without relying on external servers.
 
 ---
 
-## 🚀 Repository Highlights
+## Repository Highlights
 
-- **Complete Android application** with a fully functional FER pipeline.
-- **Fully on-device Deep Learning inference** (Zero latency, high privacy).
-- **Lightweight TensorFlow Lite model** (<1 MB) based on RS-Xception.
-- **Google ML Kit integration** for robust real-time face detection.
-- **SQLite local persistence** for offline mood tracking and history.
-- **Interactive statistics dashboards** for emotional trends.
-- **End-to-end FER pipeline**: From raw camera pixels to emotional insights.
-- **Research notebooks included** (Jupyter) for full model reproducibility.
-- **Ready-to-install Android APK** provided in the repository.
-
----
-
-## ✨ Main Features
-
-- **Real-time Inference**: Facial emotion recognition performed on-device.
-- **On-Device Face Detection**: Powered by Google ML Kit for high-performance localization.
-- **7-Class Recognition**: Predicts *Happy, Sad, Angry, Fear, Disgust, Neutral, and Surprise*.
-- **Cumulative Weighted Mapping**: Statistics are calculated using the full 7-class probability spectrum for every scan, moving beyond simple "Top-1" predictions.
-- **Local Persistence**: Mood history and emotional scores stored using SQLite.
-- **Emotional Intelligence Dashboards**: Detailed statistics for emotion distribution and user-model agreement.
-- **Privacy-First Architecture**: No cloud inference; sensitive biometric data never leaves the device.
+- **Complete Android application** implementing an **end-to-end Facial Emotion Recognition pipeline**.
+- **Lightweight RS-Xception** Deep Learning model optimized for **TensorFlow Lite deployment**.
+- **Real-time on-device** emotion recognition using the **smartphone camera**.
+- **Automatic face detection** and preprocessing using **Google ML Kit**.
+- **Local SQLite database** for storing **emotion history and user feedback**.
+- **Interactive statistical dashboards** for emotion distribution and prediction analysis.
+- **Fully offline operation** without Internet connectivity or **cloud inference**.
+- **Jupyter notebooks** containing the complete **model development and training pipeline**.
+- **Ready-to-install Android APK** for deployment on **physical devices**.
 
 ---
 
-## 📖 How to Use Face2Mood
+## Main Features
+
+- **Real-time Facial Emotion Recognition** directly on Android devices.
+- **Automatic Face Detection** using Google ML Kit before model inference.
+- **Recognition of Seven Basic Emotions**: Angry, Disgust, Fear, Happy, Neutral, Sad, and Surprise.
+- **Top-3 Emotion Predictions** together with confidence scores for each captured image.
+- **Emotion Interpretation** through color-based feedback and personalized suggestions.
+- **Local Mood History** stored securely in a SQLite database.
+- **Interactive Statistics Dashboard** presenting emotion distribution, dominant emotions, and user–model agreement.
+- **Privacy-Oriented Design**, where all image processing, inference, and data storage are performed entirely on the user's device.
+
+---
+
+## How to Use Face2Mood
 
 After launching the application, follow these steps:
 
 ### Step 1 — Position Your Face
 - Hold the smartphone approximately 30–50 cm from your face.
 - Ensure your face is fully visible within the frame.
-- Use good lighting conditions (500+ lux recommended).
+- Use good lighting conditions.
 - Look directly at the camera.
 
 ### Step 2 — Capture an Emotion
@@ -81,7 +81,7 @@ The **Profile** page allows you to:
 
 ---
 
-## ⚙️ Application Workflow
+## Application Workflow
 
 ```text
 Launch Application
@@ -137,7 +137,8 @@ Statistics Dashboard
         ▼
 ```
 
-<img src="docs/app_screenshots/stats_menu.jpeg" width="200" />&nbsp;&nbsp;<img src="docs/app_screenshots/top_prediction_count.jpeg" width="200" />&nbsp;&nbsp;<img src="docs/app_screenshots/recent history - stats.png"
+<img src="docs/app_screenshots/stats_menu.jpeg" width="200" />&nbsp;&nbsp;&nbsp;&nbsp;<img src="docs/app_screenshots/top_prediction_count.jpeg" width="200" />&nbsp;&nbsp;&nbsp;&nbsp;<img src="docs/app_screenshots/recent%20history%20-%20stats.png" width="200" />
+
 
 ```text
         │
@@ -151,9 +152,9 @@ User Profile & Privacy
 
 ---
 
-## 🏗️ System Architecture
+## System Architecture
 
-### 📂 Repository Structure
+### Repository Structure
 ```text
 Face2Mood/
 ├── assets/
@@ -185,7 +186,7 @@ Face2Mood/
 
 ---
 
-## 📦 Dependencies & Requirements
+## Dependencies & Requirements
 
 ### Core Libraries
 | Library | Version | Purpose |
@@ -194,7 +195,7 @@ Face2Mood/
 | **tflite_flutter** | 0.12.1 | TensorFlow Lite model inference |
 | **google_mlkit_face_detection** | 0.13.0 | Real-time face detection and localization |
 | **sqflite** | 2.3.0 | SQLite database management and persistence |
-| **fl_chart** | 0.66.0 | Statistics visualization (pie charts, bar charts) |
+| **fl_chart** | 0.66.0 | Statistics visualization (pie charts) |
 | **image** | 4.2.0 | Image processing and preprocessing |
 | **intl** | 0.19.0 | Internationalization and date formatting |
 | **path_provider** | 2.1.4 | Access to device file system paths |
@@ -212,12 +213,12 @@ Face2Mood/
 ### Build Dependencies
 ```bash
 flutter pub get
-flutter doctor  # Verify all requirements are met
+flutter doctor  # Verify if all requirements are met
 ```
 
 ---
 
-## 🧬 Deep Learning Model Evaluation
+## Deep Learning Model Evaluation
 
 The emotion recognition model is based on a lightweight **RS-Xception** architecture trained from scratch on the **FER-2013** dataset.
 
@@ -231,7 +232,7 @@ The emotion recognition model is based on a lightweight **RS-Xception** architec
 | Inference Time | ~6.73 ms |
 | Total End-to-End Time | ~513.97 ms |
 
-### 📈 Cropped vs. Uncropped Analysis
+### Cropped vs. Uncropped Analysis
 Experimental results show that automatic face cropping using Google ML Kit significantly improves recognition performance by reducing background noise.
 
 | Preprocessing Strategy | Top-1 Accuracy | Top-3 Accuracy |
@@ -262,11 +263,11 @@ Experimental results show that automatic face cropping using Google ML Kit signi
 - Framework: TensorFlow Lite 2.12+
 - Final size: 0.91 MB
 
-**Full reproducible training code**: See `research/training_pipeline.ipynb`
+**Full reproducible training code**: See `assets/notebooks/RS-XCeption_v2.ipynb`
 
 ---
 
-## ⚖️ Limitations & Ethical Considerations
+## Limitations
 
 ### Dataset & Model Limitations
 
@@ -329,34 +330,18 @@ Additional limitations have been identified through experimentation:
 
 ### Test Coverage
 
-The project includes comprehensive unit and integration tests for:
-- Service layer logic (database, emotion utilities, preprocessing)
-- Camera and face detection pipeline
-- Model inference accuracy across different input scenarios
-- Database persistence and data integrity
-- Statistical calculation accuracy
+The test suite validates data models, calculations, and local storage:
+- **Database operations**: Verifies data persistence, updates, and integrity across user records.
+- **Statistical calculations**: Assures exact metrics processing for mood trends and probability spectrum distributions.
+- **Core data models**: Validates serialization and data structures across the application pipeline.
+
 
 ### Run Tests
 
 ```bash
 flutter test                    # Run all unit & integration tests
-flutter test test/unit/         # Run unit tests only
-flutter test test/integration/  # Run integration tests only
-flutter test -v                 # Verbose output
+flutter test test/<PATH_TEST>        # Run a pecific unit test
 ```
-
-### Manual Testing Checklist
-
-- [ ] Camera initialization on real device
-- [ ] Face detection responsiveness (various angles, distances, lighting)
-- [ ] Inference speed and accuracy with different face angles
-- [ ] Inference speed and accuracy with facial occlusions (glasses, masks)
-- [ ] SQLite persistence and history retrieval
-- [ ] Statistics dashboard calculations and accuracy
-- [ ] UI responsiveness on low-end devices (2GB RAM)
-- [ ] Memory consumption during extended use (>30 minutes)
-- [ ] Performance degradation under poor lighting conditions
-- [ ] Behavior with multiple faces in frame
 
 ---
 
@@ -364,9 +349,9 @@ flutter test -v                 # Verbose output
 
 ### Option A — Install the Application (APK)
 
-The easiest way to try Face2Mood is to install the provided APK.
+The easiest way to try Face2Mood is to install the provided APK, which is present in `assets/download_app` folder.
 
-1. **Download**: `app-arm64-v8a-release.apk` from the repository releases
+1. **Download**: `app-arm64-v8a-release.apk` from the specified folder
 2. **Transfer** the APK to your Android phone
 3. **Enable Install from Unknown Sources** if prompted (Settings > Security)
 4. **Install** the application
@@ -436,37 +421,6 @@ flutter build apk --release --target-platform=android-arm64
 
 ---
 
-## Troubleshooting
-
-### Common Issues
-
-| Issue | Solution |
-|-------|----------|
-| `flutter doctor` shows missing dependencies | Run `flutter pub get` and ensure Android SDK is properly installed |
-| Camera permission denied at runtime | Grant camera permission in Android Settings > Apps > Face2Mood > Permissions |
-| Model fails to load (`.tflite` not found) | Verify `assets/models/` directory contains the model file; check `pubspec.yaml` has `assets/models/` listed |
-| Slow inference (>50ms) | Close background applications; check CPU load; test on device with 4GB+ RAM |
-| App crashes on older devices | Ensure Android API Level 21+ is installed; test on emulator API 21 first |
-| Face not detected in low light | Increase ambient light to 500+ lux; ensure face is directly facing camera |
-| Poor emotion recognition accuracy | Check lighting conditions, face angle, and facial occlusions; refer to "Real-World Operational Constraints" section |
-| Emulator camera issues | Enable camera emulation in AVD settings; use physical device for best results |
-
-### Debug Mode
-
-For verbose logging and diagnostics:
-```bash
-flutter run -v
-# or
-flutter run --debug
-```
-
-Check logs with:
-```bash
-flutter logs
-```
-
----
-
 ## Model Training & Reproducibility
 
 Full training pipeline details are provided in the Jupyter notebooks, which are in the `assets/notebooks`.
@@ -483,7 +437,7 @@ Full training pipeline details are provided in the Jupyter notebooks, which are 
 
 ---
 
-## License & Attribution
+## License
 
 This project is provided for **educational purposes** as part of a Bachelor's thesis. Commercial use is not permitted without explicit permission.
 
