@@ -41,6 +41,7 @@ class FaceDetectionService {
           .now()
           .millisecondsSinceEpoch}.jpg',
     );
+    print("DEBUG: The path is: ${tempDir.path}"); // print the path of the captured mood record
 
     final tempFile = File(tempPath);
     await tempFile.writeAsBytes(imageBytes, flush: true);
