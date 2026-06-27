@@ -1,11 +1,11 @@
-# 😊 Face2Mood: On-Device Emotional Intelligence
+# Face2Mood: On-Device Emotional Intelligence
 **A BSc Computer Science Thesis Project**
 
 Face2Mood is a lightweight Android application for real-time **Facial Emotion Recognition (FER)** using Flutter, Google ML Kit, TensorFlow Lite, and SQLite. The project demonstrates a privacy-first approach to mobile AI inference by processing all facial data directly on the device without external server communication.
 
 ---
 
-## 📌 Project Context
+## Project Context
 
 This project was developed as part of a Bachelor's Thesis in Computer Science at the **West University of Timișoara**.
 
@@ -13,7 +13,7 @@ The main objective was to design and implement a complete mobile Facial Emotion 
 
 ---
 
-## 🚀 Repository Highlights
+## Repository Highlights
 
 - **Complete Android application** with a fully functional FER pipeline.
 - **Fully on-device Deep Learning inference** (Zero latency, high privacy).
@@ -27,7 +27,7 @@ The main objective was to design and implement a complete mobile Facial Emotion 
 
 ---
 
-## ✨ Main Features
+## Main Features
 
 - **Real-time Inference**: Facial emotion recognition performed on-device.
 - **On-Device Face Detection**: Powered by Google ML Kit for high-performance localization.
@@ -39,7 +39,7 @@ The main objective was to design and implement a complete mobile Facial Emotion 
 
 ---
 
-## 📖 How to Use Face2Mood
+## How to Use Face2Mood
 
 After launching the application, follow these steps:
 
@@ -81,7 +81,7 @@ The **Profile** page allows you to:
 
 ---
 
-## ⚙️ Application Workflow
+## Application Workflow
 
 ```text
 Launch Application
@@ -151,11 +151,11 @@ User Profile & Privacy
 
 ---
 
-## 🏗️ System Architecture
+## System Architecture
 
 The application follows a **Service-Oriented Architecture (SOA)** to ensure modularity, maintainability, and academic rigor.
 
-### 📂 Repository Structure
+### Repository Structure
 ```text
 Face2Mood/
 ├── assets/
@@ -187,7 +187,7 @@ Face2Mood/
 
 ---
 
-## 📦 Dependencies & Requirements
+## Dependencies & Requirements
 
 ### Core Libraries
 | Library | Version | Purpose |
@@ -198,8 +198,6 @@ Face2Mood/
 | **sqflite** | 2.3.0 | SQLite database management and persistence |
 | **fl_chart** | 0.66.0 | Statistics visualization (pie charts, bar charts) |
 | **image** | 4.2.0 | Image processing and preprocessing |
-| **intl** | 0.19.0 | Internationalization and date formatting |
-| **path_provider** | 2.1.4 | Access to device file system paths |
 
 ### Platform Requirements
 | Requirement | Specification |
@@ -219,7 +217,7 @@ flutter doctor  # Verify all requirements are met
 
 ---
 
-## 🧬 Deep Learning Model Evaluation
+#Deep Learning Model Evaluation
 
 The emotion recognition model is based on a lightweight **RS-Xception** architecture trained from scratch on the **FER-2013** dataset.
 
@@ -268,19 +266,19 @@ Experimental results show that automatic face cropping using Google ML Kit signi
 
 ---
 
-## ⚖️ Ethical Considerations & Limitations
+## Ethical Considerations & Limitations
 
 ### Important Disclaimers
 
-⚠️ **NOT a Medical Tool**: This application is **NOT** a clinical diagnostic or medical tool. Predictions should **NOT** be used for medical, psychological, or therapeutic decisions. Always consult qualified healthcare professionals.
+**NOT a Medical Tool**: This application is **NOT** a clinical diagnostic or medical tool. Predictions should **NOT** be used for medical, psychological, or therapeutic decisions. Always consult qualified healthcare professionals.
 
-⚠️ **Model Bias & Demographic Variance**: The model is trained on FER-2013, which has documented demographic biases:
+**Model Bias & Demographic Variance**: The model is trained on FER-2013, which has documented demographic biases:
 - Performance may vary significantly across different ethnicities, ages, and genders
 - Model was primarily trained on Western faces
 - Age bias: Better performance on adult faces than children
 - Potential underperformance on individuals with facial differences
 
-⚠️ **Accuracy Constraints**: 
+ **Accuracy Constraints**: 
 - Validation accuracy of 65% means approximately **35% of predictions may be incorrect**
 - Results should be interpreted with appropriate caution
 - Performance degrades with non-frontal face angles (>45° angle deviation)
