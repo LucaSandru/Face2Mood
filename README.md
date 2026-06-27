@@ -1,19 +1,19 @@
-# Face2Mood: On-Device Emotional Intelligence
+# 😊 Face2Mood: On-Device Emotional Intelligence
 **A BSc Computer Science Thesis Project**
 
-Face2Mood is a lightweight Android application for real-time **Facial Emotion Recognition (FER)** using Flutter, Google ML Kit, TensorFlow Lite, and SQLite. The project demonstrates a privacy-first approach to mobile AI inference by processing all facial data directly on the device without external server communication.
+Face2Mood is a lightweight Android application for real-time **Facial Emotion Recognition (FER)** using Flutter, Google ML Kit, TensorFlow Lite, and SQLite. The project demonstrates a privacy-first approach to mobile emotion recognition without external server communication.
 
 ---
 
-## Project Context
+## 📌 Project Context
 
 This project was developed as part of a Bachelor's Thesis in Computer Science at the **West University of Timișoara**.
 
-The main objective was to design and implement a complete mobile Facial Emotion Recognition system capable of running directly on Android devices without external server communication, adhering to strict privacy-by-design principles and demonstrating efficient on-device deep learning inference.
+The main objective was to design and implement a complete mobile Facial Emotion Recognition system capable of running directly on Android devices without external server communication, adhering to strict privacy-by-design principles and demonstrating practical deep learning deployment on resource-constrained mobile hardware.
 
 ---
 
-## Repository Highlights
+## 🚀 Repository Highlights
 
 - **Complete Android application** with a fully functional FER pipeline.
 - **Fully on-device Deep Learning inference** (Zero latency, high privacy).
@@ -27,7 +27,7 @@ The main objective was to design and implement a complete mobile Facial Emotion 
 
 ---
 
-## Main Features
+## ✨ Main Features
 
 - **Real-time Inference**: Facial emotion recognition performed on-device.
 - **On-Device Face Detection**: Powered by Google ML Kit for high-performance localization.
@@ -39,7 +39,7 @@ The main objective was to design and implement a complete mobile Facial Emotion 
 
 ---
 
-## How to Use Face2Mood
+## 📖 How to Use Face2Mood
 
 After launching the application, follow these steps:
 
@@ -81,7 +81,7 @@ The **Profile** page allows you to:
 
 ---
 
-## Application Workflow
+## ⚙️ Application Workflow
 
 ```text
 Launch Application
@@ -137,7 +137,7 @@ Statistics Dashboard
         ▼
 ```
 
-<img src="docs/app_screenshots/stats_menu.jpeg" width="200" />&nbsp;&nbsp;<img src="docs/app_screenshots/top_prediction_count.jpeg" width="200" />&nbsp;&nbsp;<img src="docs/app_screenshots/recent%20history%20-%20stats.png" width="200" />
+<img src="docs/app_screenshots/stats_menu.jpeg" width="200" />&nbsp;&nbsp;<img src="docs/app_screenshots/top_prediction_count.jpeg" width="200" />&nbsp;&nbsp;<img src="docs/app_screenshots/recent%20hi[...]
 
 ```text
         │
@@ -151,11 +151,11 @@ User Profile & Privacy
 
 ---
 
-## System Architecture
+## 🏗️ System Architecture
 
 The application follows a **Service-Oriented Architecture (SOA)** to ensure modularity, maintainability, and academic rigor.
 
-### Repository Structure
+### 📂 Repository Structure
 ```text
 Face2Mood/
 ├── assets/
@@ -187,7 +187,7 @@ Face2Mood/
 
 ---
 
-## Dependencies & Requirements
+## 📦 Dependencies & Requirements
 
 ### Core Libraries
 | Library | Version | Purpose |
@@ -198,6 +198,8 @@ Face2Mood/
 | **sqflite** | 2.3.0 | SQLite database management and persistence |
 | **fl_chart** | 0.66.0 | Statistics visualization (pie charts, bar charts) |
 | **image** | 4.2.0 | Image processing and preprocessing |
+| **intl** | 0.19.0 | Internationalization and date formatting |
+| **path_provider** | 2.1.4 | Access to device file system paths |
 
 ### Platform Requirements
 | Requirement | Specification |
@@ -217,7 +219,7 @@ flutter doctor  # Verify all requirements are met
 
 ---
 
-#Deep Learning Model Evaluation
+## 🧬 Deep Learning Model Evaluation
 
 The emotion recognition model is based on a lightweight **RS-Xception** architecture trained from scratch on the **FER-2013** dataset.
 
@@ -266,45 +268,89 @@ Experimental results show that automatic face cropping using Google ML Kit signi
 
 ---
 
-## Ethical Considerations & Limitations
+## ⚖️ Limitations & Ethical Considerations
 
-### Important Disclaimers
+### Critical Disclaimers
 
-**NOT a Medical Tool**: This application is **NOT** a clinical diagnostic or medical tool. Predictions should **NOT** be used for medical, psychological, or therapeutic decisions. Always consult qualified healthcare professionals.
+⚠️ **NOT a Medical Tool**: This application is **NOT** a clinical diagnostic or medical tool. Predictions should **NOT** be used for medical, psychological, or therapeutic decisions. Always consult qualified healthcare professionals for medical advice.
 
-**Model Bias & Demographic Variance**: The model is trained on FER-2013, which has documented demographic biases:
-- Performance may vary significantly across different ethnicities, ages, and genders
-- Model was primarily trained on Western faces
-- Age bias: Better performance on adult faces than children
-- Potential underperformance on individuals with facial differences
+⚠️ **Model Bias & Demographic Variance**: The model is trained on FER-2013, which has documented demographic biases:
+- **Performance variance**: Recognition accuracy may vary significantly across different ethnicities, ages, and genders
+- **Training bias**: Model was primarily trained on Western faces, potentially underperforming on non-Western demographics
+- **Age-related bias**: Better performance on adult faces than children or elderly individuals
+- **Facial differences**: Potential underperformance on individuals with facial differences, beards, makeup, or head coverings
 
- **Accuracy Constraints**: 
-- Validation accuracy of 65% means approximately **35% of predictions may be incorrect**
+⚠️ **Accuracy Constraints**: 
+- **Validation accuracy of 65%** means approximately **35% of predictions may be incorrect**
 - Results should be interpreted with appropriate caution
 - Performance degrades with non-frontal face angles (>45° angle deviation)
+- **Class imbalance effects**: The FER-2013 dataset exhibits significant class imbalance, with emotions such as Happiness and Neutral being considerably more represented than Disgust and Fear. This results in comparatively lower recognition performance for minority emotion classes despite use of class weighting and data augmentation techniques.
 
-### Operational Constraints
+### Real-World Operational Constraints
 
-| Factor | Impact |
-|--------|--------|
-| **Lighting Conditions** | Optimal performance at 500+ lux; poor lighting reduces accuracy |
-| **Face Angle** | Performance best at frontal faces; degrades beyond ±45° |
-| **Device Performance** | Slower inference on devices with <2GB RAM |
-| **Model Generalization** | Limited to 7 emotion classes; nuanced emotions not captured |
+| Factor | Impact | Recommendation |
+|--------|--------|-----------------|
+| **Lighting Conditions** | Optimal performance at 500+ lux; poor lighting reduces accuracy | Use bright, uniform lighting without harsh shadows |
+| **Face Angle** | Performance best at frontal faces; degrades beyond ±45° | Keep face directly facing the camera |
+| **Facial Occlusions** | Accuracy affected by glasses, masks, head coverings, or beards | Ensure facial features are clearly visible |
+| **Image Quality** | Lower resolution or blurry images reduce recognition performance | Use high-quality camera with auto-focus enabled |
+| **Device Performance** | Slower inference on devices with <2GB RAM | Run on devices with 4GB+ RAM for optimal speed |
+| **Model Generalization** | Limited to 7 discrete emotion classes; nuanced emotions not captured | Use as sentiment indicator, not precise emotion measure |
+
+### Dataset & Model Limitations
+
+The system relies on the **FER-2013 dataset** (Goodfellow et al., 2013), which has several documented limitations affecting system robustness:
+
+#### Dataset Class Imbalance
+
+The FER-2013 dataset exhibits significant class imbalance:
+- **Happiness**: 8,989 samples (heavily overrepresented)
+- **Neutral**: 6,198 samples (overrepresented)
+- **Disgust**: 547 samples (severely underrepresented)
+- **Fear**: 5,121 samples (underrepresented)
+
+Despite employing class weighting during training and data augmentation techniques, the recognition performance for minority emotion classes remains comparatively lower than majority classes. This limitation directly impacts the model's ability to accurately recognize disgust and fear emotions in real-world scenarios.
+
+#### Challenges Under Real-World Conditions
+
+Additional limitations have been identified through experimentation:
+
+1. **Facial Occlusions & Variations**: The system's robustness degrades under challenging real-world conditions including:
+   - Variations in illumination (shadows, backlighting, uneven lighting)
+   - Head pose variations and face angles beyond ±45° from frontal view
+   - Facial occlusions (glasses, masks, head coverings, partial visibility)
+   - Image quality variations (blur, low resolution, compression artifacts)
+   - When facial features are partially hidden or captured under unfavorable conditions
+
+2. **Dataset Quality & Representativeness**:
+   - Images are low-resolution (48×48 grayscale) with variable image quality
+   - Limited diversity: Training primarily on Western faces reduces generalization to other ethnic groups
+   - Static expressions: Dataset contains posed emotions which may differ significantly from spontaneous real-world expressions
+   - Limited demographic coverage across age groups and gender identities
+
+#### Future Research Directions
+
+To address these limitations, future work may investigate:
+- **Dataset Integration**: Integration of larger and more diverse FER datasets (e.g., AffectNet, SFEW, RAF-DB) to improve class balance and enhance model generalization across demographics
+- **Advanced Augmentation**: Enhanced data augmentation strategies targeting challenging conditions (occlusions, pose variations, lighting changes)
+- **Improved Architectures**: Development of lightweight architectures capable of maintaining stable performance under occlusions and non-frontal poses while maintaining mobile deployment feasibility
+- **Robustness Optimization**: Techniques to improve model performance on minority emotion classes and underrepresented demographic groups
 
 ### Privacy Statement
 - ✅ **No data transmission**: All processing remains strictly on-device
 - ✅ **No cloud storage**: Biometric data never leaves the device
 - ✅ **Offline functionality**: Zero internet permissions required for core functionality
-- ✅ **Local storage only**: Optional mood history stored in private SQLite database
+- ✅ **Local storage only**: Optional mood history stored in private SQLite database on the user's device
+- ✅ **No third-party sharing**: Emotional data is never shared with external services or third parties
 
 ---
 
 ## 🔒 Privacy & Architecture
 
-- **On-Device Inference**: Biometric data is processed in-memory and discarded after inference.
-- **Local Storage**: All emotional history is stored in a private SQLite instance.
-- **Offline Functionality**: The application requires zero internet permissions for core functionality, adhering to "Privacy-by-Design" principles.
+- **On-Device Inference**: Biometric data is processed in-memory and immediately discarded after inference; no persistent storage of raw biometric data.
+- **Local Storage**: All emotional history is stored in a private SQLite instance with no external synchronization.
+- **Offline Functionality**: The application requires zero internet permissions for core functionality, fully adhering to "Privacy-by-Design" principles.
+- **Data Minimization**: Only emotion predictions and timestamps are stored; raw facial images are never persisted.
 
 ---
 
@@ -315,8 +361,9 @@ Experimental results show that automatic face cropping using Google ML Kit signi
 The project includes comprehensive unit and integration tests for:
 - Service layer logic (database, emotion utilities, preprocessing)
 - Camera and face detection pipeline
-- Model inference accuracy
+- Model inference accuracy across different input scenarios
 - Database persistence and data integrity
+- Statistical calculation accuracy
 
 ### Run Tests
 
@@ -330,12 +377,15 @@ flutter test -v                 # Verbose output
 ### Manual Testing Checklist
 
 - [ ] Camera initialization on real device
-- [ ] Face detection responsiveness (various angles, distances)
+- [ ] Face detection responsiveness (various angles, distances, lighting)
 - [ ] Inference speed and accuracy with different face angles
+- [ ] Inference speed and accuracy with facial occlusions (glasses, masks)
 - [ ] SQLite persistence and history retrieval
-- [ ] Statistics dashboard calculations
-- [ ] UI responsiveness on low-end devices
-- [ ] Memory consumption during extended use
+- [ ] Statistics dashboard calculations and accuracy
+- [ ] UI responsiveness on low-end devices (2GB RAM)
+- [ ] Memory consumption during extended use (>30 minutes)
+- [ ] Performance degradation under poor lighting conditions
+- [ ] Behavior with multiple faces in frame
 
 ---
 
@@ -427,6 +477,7 @@ flutter build apk --release --target-platform=android-arm64
 | Slow inference (>50ms) | Close background applications; check CPU load; test on device with 4GB+ RAM |
 | App crashes on older devices | Ensure Android API Level 21+ is installed; test on emulator API 21 first |
 | Face not detected in low light | Increase ambient light to 500+ lux; ensure face is directly facing camera |
+| Poor emotion recognition accuracy | Check lighting conditions, face angle, and facial occlusions; refer to "Real-World Operational Constraints" section |
 | Emulator camera issues | Enable camera emulation in AVD settings; use physical device for best results |
 
 ### Debug Mode
@@ -456,11 +507,11 @@ Full training pipeline details are provided in the Jupyter notebook: `research/t
 ### Training Steps
 1. Data loading and preprocessing (normalization, augmentation)
 2. RS-Xception model architecture definition
-3. Training with validation monitoring
+3. Training with validation monitoring and class weighting
 4. Hyperparameter tuning and early stopping
-5. Model evaluation on test set
+5. Model evaluation on test set with per-class performance analysis
 6. TFLite conversion with dynamic range quantization
-7. Performance verification on mobile
+7. Performance verification on mobile hardware
 
 ---
 
