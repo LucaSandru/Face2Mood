@@ -92,7 +92,7 @@ Initialize Camera
         ▼
 ```
 
-![Home](docs/app_screenshots/home_screen.png)
+<img src="docs/app_screenshots/home_screen.png" width="200" />
 
 ```text
         │
@@ -111,7 +111,7 @@ TensorFlow Lite Inference
         ▼
 ```
 
-![Prediction](docs/app_screenshots/button_prediction.png)
+<img src="docs/app_screenshots/button_prediction.png" width="200" />
 
 ```text
         │
@@ -119,12 +119,19 @@ TensorFlow Lite Inference
 Top-3 Emotion Predictions
         │
         ▼
+```
+
+<img src="docs/app_screenshots/results_emotions.png" width="200" />
+
+```text
+        │
+        ▼
 Emotion Interpretation
         │
         ▼
 ```
 
-![More Info](docs/app_screenshots/emotional_palletemore info.png)
+<img src="docs/app_screenshots/emotional_pallete(more info).png" width="200" />
 
 ```text
         │
@@ -137,7 +144,8 @@ Statistics Dashboard
         ▼
 ```
 
-![Statistics](docs/app_screenshots/recent%20history%20-%20stats.png)
+<img src="docs/app_screenshots/stats_menu.jpeg" width="200" />&nbsp;&nbsp;&nbsp;&nbsp;<img src="docs/app_screenshots/top_prediction_count.jpeg" width="200" />&nbsp;&nbsp;&nbsp;&nbsp;<img src="docs/app_screenshots/user%20vs%20model%20agreement%20-%20stats.jpeg" width="200" />
+
 
 ```text
         │
@@ -147,10 +155,10 @@ User Profile & Privacy
         ▼
 ```
 
-![Profile](docs/app_screenshots/profile%20page\(1\).jpeg)
-
+<img src="docs/app_screenshots/profile page(1).jpeg" width="200" />&nbsp;&nbsp;&nbsp;&nbsp;<img src="docs/app_screenshots/profile page(2).jpeg" width="200" />
 
 ---
+
 
 ## 🏗️ System Architecture
 
