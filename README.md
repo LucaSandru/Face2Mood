@@ -137,7 +137,7 @@ Statistics Dashboard
         ▼
 ```
 
-<img src="docs/app_screenshots/stats_menu.jpeg" width="200" />&nbsp;&nbsp;<img src="docs/app_screenshots/top_prediction_count.jpeg" width="200" />&nbsp;&nbsp;<img src="docs/app_screenshots/recent%20hi[...]
+<img src="docs/app_screenshots/stats_menu.jpeg" width="200" />&nbsp;&nbsp;<img src="docs/app_screenshots/top_prediction_count.jpeg" width="200" />&nbsp;&nbsp;<img src="docs/app_screenshots/recent history - stats.png"
 
 ```text
         │
@@ -152,8 +152,6 @@ User Profile & Privacy
 ---
 
 ## 🏗️ System Architecture
-
-The application follows a **Service-Oriented Architecture (SOA)** to ensure modularity, maintainability, and academic rigor.
 
 ### 📂 Repository Structure
 ```text
@@ -244,7 +242,7 @@ Experimental results show that automatic face cropping using Google ML Kit signi
 
 ### Dataset & Training Configuration
 
-**Dataset**: FER-2013 (Goodfellow et al.)
+**Dataset**: FER-2013
 - Training samples: 35,887
 - Validation samples: 3,589
 - Test samples: 3,589
@@ -270,36 +268,9 @@ Experimental results show that automatic face cropping using Google ML Kit signi
 
 ## ⚖️ Limitations & Ethical Considerations
 
-### Critical Disclaimers
-
-⚠️ **NOT a Medical Tool**: This application is **NOT** a clinical diagnostic or medical tool. Predictions should **NOT** be used for medical, psychological, or therapeutic decisions. Always consult qualified healthcare professionals for medical advice.
-
-⚠️ **Model Bias & Demographic Variance**: The model is trained on FER-2013, which has documented demographic biases:
-- **Performance variance**: Recognition accuracy may vary significantly across different ethnicities, ages, and genders
-- **Training bias**: Model was primarily trained on Western faces, potentially underperforming on non-Western demographics
-- **Age-related bias**: Better performance on adult faces than children or elderly individuals
-- **Facial differences**: Potential underperformance on individuals with facial differences, beards, makeup, or head coverings
-
-⚠️ **Accuracy Constraints**: 
-- **Validation accuracy of 65%** means approximately **35% of predictions may be incorrect**
-- Results should be interpreted with appropriate caution
-- Performance degrades with non-frontal face angles (>45° angle deviation)
-- **Class imbalance effects**: The FER-2013 dataset exhibits significant class imbalance, with emotions such as Happiness and Neutral being considerably more represented than Disgust and Fear. This results in comparatively lower recognition performance for minority emotion classes despite use of class weighting and data augmentation techniques.
-
-### Real-World Operational Constraints
-
-| Factor | Impact | Recommendation |
-|--------|--------|-----------------|
-| **Lighting Conditions** | Optimal performance at 500+ lux; poor lighting reduces accuracy | Use bright, uniform lighting without harsh shadows |
-| **Face Angle** | Performance best at frontal faces; degrades beyond ±45° | Keep face directly facing the camera |
-| **Facial Occlusions** | Accuracy affected by glasses, masks, head coverings, or beards | Ensure facial features are clearly visible |
-| **Image Quality** | Lower resolution or blurry images reduce recognition performance | Use high-quality camera with auto-focus enabled |
-| **Device Performance** | Slower inference on devices with <2GB RAM | Run on devices with 4GB+ RAM for optimal speed |
-| **Model Generalization** | Limited to 7 discrete emotion classes; nuanced emotions not captured | Use as sentiment indicator, not precise emotion measure |
-
 ### Dataset & Model Limitations
 
-The system relies on the **FER-2013 dataset** (Goodfellow et al., 2013), which has several documented limitations affecting system robustness:
+The system relies on the **FER-2013 dataset**, which has several documented limitations affecting system robustness:
 
 #### Dataset Class Imbalance
 
@@ -330,22 +301,22 @@ Additional limitations have been identified through experimentation:
 
 #### Future Research Directions
 
-To address these limitations, future work may investigate:
-- **Dataset Integration**: Integration of larger and more diverse FER datasets (e.g., AffectNet, SFEW, RAF-DB) to improve class balance and enhance model generalization across demographics
-- **Advanced Augmentation**: Enhanced data augmentation strategies targeting challenging conditions (occlusions, pose variations, lighting changes)
-- **Improved Architectures**: Development of lightweight architectures capable of maintaining stable performance under occlusions and non-frontal poses while maintaining mobile deployment feasibility
-- **Robustness Optimization**: Techniques to improve model performance on minority emotion classes and underrepresented demographic groups
+- **Alternative Architectures**: Investigate lightweight backbones, attention mechanisms, or hybrid neural approaches to improve accuracy while keeping mobile deployment efficient.
+- **Explainable AI (XAI)**: Integrate techniques like Integrated Gradients (IG) into the *More Info* view to visualize high-activation facial regions and build user trust.
+- **Video-Based Tracking**: Extend the framework from static image inference to continuous video tracking to analyze real-time emotional dynamics over time.
+- **Interactive Assistance**: Evolve from a passive monitoring tool into an interactive emotional assistant by embedding conversational AI features and personalized feedback.
+
 
 ### Privacy Statement
-- ✅ **No data transmission**: All processing remains strictly on-device
-- ✅ **No cloud storage**: Biometric data never leaves the device
-- ✅ **Offline functionality**: Zero internet permissions required for core functionality
-- ✅ **Local storage only**: Optional mood history stored in private SQLite database on the user's device
-- ✅ **No third-party sharing**: Emotional data is never shared with external services or third parties
+- **No data transmission**: All processing remains strictly on-device
+- **No cloud storage**: Biometric data never leaves the device
+- **Offline functionality**: Zero internet permissions required for core functionality
+- **Local storage only**: Optional mood history stored in private SQLite database on the user's device
+- **No third-party sharing**: Emotional data is never shared with external services or third parties
 
 ---
 
-## 🔒 Privacy & Architecture
+## Privacy & Architecture
 
 - **On-Device Inference**: Biometric data is processed in-memory and immediately discarded after inference; no persistent storage of raw biometric data.
 - **Local Storage**: All emotional history is stored in a private SQLite instance with no external synchronization.
@@ -354,7 +325,7 @@ To address these limitations, future work may investigate:
 
 ---
 
-## ✅ Testing & Validation
+## Testing & Validation
 
 ### Test Coverage
 
@@ -389,7 +360,7 @@ flutter test -v                 # Verbose output
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Option A — Install the Application (APK)
 
@@ -401,7 +372,7 @@ The easiest way to try Face2Mood is to install the provided APK.
 4. **Install** the application
 5. **Launch** Face2Mood and grant camera permissions
 
-> ✅ **No Internet connection is required**
+>  **No Internet connection is required**
 
 ### Option B — Run from Source
 
@@ -465,7 +436,7 @@ flutter build apk --release --target-platform=android-arm64
 
 ---
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### Common Issues
 
@@ -496,15 +467,12 @@ flutter logs
 
 ---
 
-## 📚 Model Training & Reproducibility
+## Model Training & Reproducibility
 
-Full training pipeline details are provided in the Jupyter notebook: `research/training_pipeline.ipynb`
+Full training pipeline details are provided in the Jupyter notebooks, which are in the `assets/notebooks`.
 
-### Dataset Source
-- **FER-2013**: https://www.kaggle.com/datasets/msambare/fer2013
-- Paper: Goodfellow, I. J., et al. (2013). "Challenges in Representation Learning: A report on three machine learning contests." ICML.
 
-### Training Steps
+### Training Steps (presented into notebook)
 1. Data loading and preprocessing (normalization, augmentation)
 2. RS-Xception model architecture definition
 3. Training with validation monitoring and class weighting
@@ -515,24 +483,18 @@ Full training pipeline details are provided in the Jupyter notebook: `research/t
 
 ---
 
-## 📜 License & Attribution
+## License & Attribution
 
 This project is provided for **educational purposes** as part of a Bachelor's thesis. Commercial use is not permitted without explicit permission.
 
-### Model & Dataset Attribution
-
-- **FER-2013 Dataset**: Goodfellow et al., https://www.kaggle.com/datasets/msambare/fer2013
-- **Google ML Kit**: Google, https://developers.google.com/ml-kit
-- **TensorFlow Lite**: Google, https://www.tensorflow.org/lite
-- **RS-Xception Architecture**: Original papers on depthwise separable convolutions
 
 ---
 
-## 📚 Related Publication
+## Related Publication
 
 This repository accompanies the Bachelor's Thesis:
 
-**Face2Mood: A Lightweight Mobile Application for Real-Time Facial Emotion Recognition**
+**Face2Mood: Mobile Emotion Recognition System**
 
 Bachelor of Computer Science  
 West University of Timișoara  
@@ -540,7 +502,7 @@ West University of Timișoara
 
 ---
 
-## 📧 Support & Contact
+## Support & Contact
 
 For questions or issues related to this thesis project:
 
@@ -552,7 +514,7 @@ For questions or issues related to this thesis project:
 
 ---
 
-## 👨‍💻 Author
+## Author
 
 **Luca-David Șandru**  
 Bachelor's Thesis Project  
