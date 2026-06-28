@@ -203,8 +203,6 @@ Face2Mood/
 | **sqflite** | 2.3.0 | SQLite database management and persistence |
 | **fl_chart** | 0.66.0 | Statistics visualization (pie charts) |
 | **image** | 4.2.0 | Image processing and preprocessing |
-| **intl** | 0.19.0 | Internationalization and date formatting |
-| **path_provider** | 2.1.4 | Access to device file system paths |
 
 ### Platform Requirements
 | Requirement | Specification |
