@@ -154,6 +154,12 @@ User Profile & Privacy
 
 ## System Architecture
 
+<img src="assets/BSc%20Architeture.png" width="400" />
+
+The **System Architecture** diagram illustrates the end-to-end **Face2Mood** workflow. Facial images are captured by the smartphone _camera_, processed using _Google ML Kit_ and _TensorFlow Lite_, and the resulting emotion predictions are stored locally in a _SQLite database_ for visualization and _statistical analysis_.
+
+
+
 ### Repository Structure
 ```text
 Face2Mood/
