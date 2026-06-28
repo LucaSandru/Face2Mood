@@ -59,8 +59,8 @@ Press the **Capture** button. The application will:
 ### Step 3 — View Detailed Analysis
 Tap **More Info** to access:
 - Confidence scores and emotional color palette.
-- AI-driven emotion interpretation.
-- Personalized psychological suggestions.
+- Emotion interpretation based on the predicted emotion.
+- Personalized emotion-aware interpretations/suggestions.
 
 ### Step 4 — Save the Result
 Press **Save to Stats** to store the emotion record locally.
@@ -154,19 +154,36 @@ User Profile & Privacy
 
 ## System Architecture
 
+The diagram below illustrates the end-to-end **Face2Mood** workflow. Facial images are captured by the _smartphone camera_, processed using _Google ML Kit_ and _TensorFlow Lite_, and the resulting emotion predictions are stored locally in a _SQLite database_ for _visualization_ and _statistical analysis_.
+
+<img src="assets/BSc%20Architeture.png" width="200" />
+
+
+
 ### Repository Structure
 ```text
 Face2Mood/
 ├── assets/
 │   └── models/              # Optimized TensorFlow Lite models (.tflite)
+|   ├── download_app/        # .apk file for direct download
+|   ├── notebooks/           # .ipynb notebooks for training in Google Colaboratory
+|   ├── models_plots/        # plots from notebooks used in analysis for each model
+|        ├── RS-Xception_v1/
+|        ├── RS-Xception_v2/
+|        ├── RS-Xception_v3/
+|        ├── RS-Xception_v4/
+|   ├── BSc Architeture.png  # archhitecture of the application
 ├── docs/
-│   └── screenshots/         # UI/UX documentation images
+│   └── app_screenshots/         # UI/UX documentation images
+|   ├── cropped_vs_uncropped/    
+        ├── test/                # folder with images used in testing
+        ├── results cropped vs. uncropped.xlsx   # details of the cropped vs. uncropped analysis
 ├── lib/                     # Flutter source code
 │   ├── screens/             # Presentation Layer
 │   │   ├── home/            # Real-time capture and inference interface
 │   │   ├── stats/           # Analytics, data visualization, and history
 │   │   └── profile/         # User profile and account management
-│   ├── services/            # Logic Layer (SOA)
+│   ├── services/ 
 │   │   ├── camera_service.dart             # Hardware abstraction
 │   │   ├── database_service.dart           # SQLite persistence logic
 │   │   ├── emotion_utils.dart              # Metadata (colors, interpretations)
@@ -186,41 +203,47 @@ Face2Mood/
 
 ---
 
-## Dependencies & Requirements
+## Technologies & Requirements
 
-### Core Libraries
-| Library | Version | Purpose |
-|---------|---------|---------|
-| **camera** | 0.11.0 | Hardware camera access and stream management |
-| **tflite_flutter** | 0.12.1 | TensorFlow Lite model inference |
-| **google_mlkit_face_detection** | 0.13.0 | Real-time face detection and localization |
-| **sqflite** | 2.3.0 | SQLite database management and persistence |
-| **fl_chart** | 0.66.0 | Statistics visualization (pie charts) |
-| **image** | 4.2.0 | Image processing and preprocessing |
-| **intl** | 0.19.0 | Internationalization and date formatting |
-| **path_provider** | 2.1.4 | Access to device file system paths |
+### Core Technologies
 
-### Platform Requirements
-| Requirement | Specification |
-|------------|---------------|
-| **Android** | API Level 21+ (Android 5.0 Lollipop) |
-| **Flutter SDK** | 3.10.7+ |
-| **Dart** | 3.10.7+ |
-| **Device Memory** | Minimum 2GB RAM (4GB+ recommended) |
-| **Camera** | Rear-facing camera with auto-focus capability |
-| **Storage** | Minimum 50 MB free space |
+- Flutter
+- Dart
+- TensorFlow Lite
+- Google ML Kit
+- SQLite
+- fl_chart
 
-### Build Dependencies
+### Requirements
+
+- Android 5.0 (API 21) or later
+- Flutter SDK
+- Android Studio (recommended)
+
+### Build
+
 ```bash
 flutter pub get
-flutter doctor  # Verify if all requirements are met
-```
+flutter doctor
+````
 
 ---
 
 ## Deep Learning Model Evaluation
 
 The emotion recognition model is based on a lightweight **RS-Xception** architecture trained from scratch on the **FER-2013** dataset.
+
+### Models Comparison
+
+| Model | Accuracy | Precision | Recall | F1-Score | Parameters | Selected |
+|:------|---------:|----------:|-------:|---------:|-----------:|:--------:|
+| RSX_V1 | 35.83% | 32.50% | 39.90% | 32.60% | 514,600 | No |
+| **RSX_V2** | **65.05%** | **63.40%** | **64.80%** | **63.80%** | **847,747** | **Yes** |
+| RSX_V3 | 64.31% | 65.00% | 61.50% | 62.80% | 847,747 | No |
+| RSX_V4 | 65.14% | 63.60% | 62.90% | 63.10% | 847,747 | No |
+
+**Note:** Although RSX_V4 achieved a slightly higher test accuracy, RSX_V2 was selected for mobile deployment because it demonstrated the best balance across Precision, Recall, and F1-Score, alongside stable training behavior. The training logs, training plots, and evaluation metrics for all configurations are located in the `assets/models_plots/` folder.
+
 
 ### Model Performance Metrics
 
@@ -241,14 +264,20 @@ Experimental results show that automatic face cropping using Google ML Kit signi
 | Manually Cropped Faces | 37.1% | 68.6% |
 | Automatically Cropped Faces | 42.9% | 77.1% |
 
+**Note:** The complete analysis spreadsheet is available at `docs/cropped_vs_uncropped/results%20cropped%20vs.%20uncropped.xlsx`, and the evaluation dataset images are located in the `docs/cropped_vs_uncropped/test/` folder.
+
+
 ### Dataset & Training Configuration
 
-**Dataset**: FER-2013
-- Training samples: 35,887
-- Validation samples: 3,589
-- Test samples: 3,589
-- Image format: 48×48 grayscale
-- Emotion classes: 7 (Happy, Sad, Angry, Fear, Disgust, Neutral, Surprise)
+**Dataset:** FER-2013
+
+- Total images: **35,887**
+- Training set: **28,709**
+- Validation set (Public Test): **3,589**
+- Test set (Private Test): **3,589**
+- Image size: **48 × 48** grayscale
+- Emotion classes: **7** (Angry, Disgust, Fear, Happy, Neutral, Sad, Surprise)
+
 
 **Training Pipeline**:
 1. **Data Preprocessing**: Normalization, augmentation (rotation, scaling, shifts)
@@ -258,10 +287,14 @@ Experimental results show that automatic face cropping using Google ML Kit signi
 5. **Batch Size**: 32
 6. **Epochs**: 100 (with early stopping at patience=15)
 
-**Model Conversion**:
-- Quantization: Dynamic range quantization
-- Framework: TensorFlow Lite 2.12+
-- Final size: 0.91 MB
+
+**Model Conversion**
+
+- Framework: TensorFlow Lite
+- Source model: Keras (.h5)
+- Deployment format: `.tflite`
+- Final model size: **0.91 MB**
+
 
 **Full reproducible training code**: See `assets/notebooks/RS-XCeption_v2.ipynb`
 
@@ -269,38 +302,29 @@ Experimental results show that automatic face cropping using Google ML Kit signi
 
 ## Limitations
 
-### Dataset & Model Limitations
+The current version of **Face2Mood** inherits several limitations commonly associated with lightweight mobile Facial Emotion Recognition systems.
 
-The system relies on the **FER-2013 dataset**, which has several documented limitations affecting system robustness:
+### Dataset Limitations
 
-#### Dataset Class Imbalance
+The model was trained on the **FER-2013** dataset, which presents several challenges:
 
-The FER-2013 dataset exhibits significant class imbalance:
-- **Happiness**: 8,989 samples (heavily overrepresented)
-- **Neutral**: 6,198 samples (overrepresented)
-- **Disgust**: 547 samples (severely underrepresented)
-- **Fear**: 5,121 samples (underrepresented)
+- Class imbalance, particularly for minority emotions such as **Disgust** and **Fear**.
+- Low-resolution grayscale images (48 × 48 pixels).
+- Limited demographic diversity.
+- Predominantly posed facial expressions that may differ from natural real-world emotions.
 
-Despite employing class weighting during training and data augmentation techniques, the recognition performance for minority emotion classes remains comparatively lower than majority classes. This limitation directly impacts the model's ability to accurately recognize disgust and fear emotions in real-world scenarios.
+### Real-World Limitations
 
-#### Challenges Under Real-World Conditions
+Recognition performance may decrease under challenging conditions, including:
 
-Additional limitations have been identified through experimentation:
+- Poor or uneven lighting.
+- Large head pose variations.
+- Facial occlusions (e.g., glasses, masks, or partially visible faces).
+- Motion blur or low-quality camera images.
 
-1. **Facial Occlusions & Variations**: The system's robustness degrades under challenging real-world conditions including:
-   - Variations in illumination (shadows, backlighting, uneven lighting)
-   - Head pose variations and face angles beyond ±45° from frontal view
-   - Facial occlusions (glasses, masks, head coverings, partial visibility)
-   - Image quality variations (blur, low resolution, compression artifacts)
-   - When facial features are partially hidden or captured under unfavorable conditions
+Despite these limitations, the proposed system demonstrates reliable real-time performance while maintaining a lightweight architecture suitable for on-device deployment.
 
-2. **Dataset Quality & Representativeness**:
-   - Images are low-resolution (48×48 grayscale) with variable image quality
-   - Limited diversity: Training primarily on Western faces reduces generalization to other ethnic groups
-   - Static expressions: Dataset contains posed emotions which may differ significantly from spontaneous real-world expressions
-   - Limited demographic coverage across age groups and gender identities
-
-#### Future Research Directions
+#### Future Directions
 
 - **Alternative Architectures**: Investigate lightweight backbones, attention mechanisms, or hybrid neural approaches to improve accuracy while keeping mobile deployment efficient.
 - **Explainable AI (XAI)**: Integrate techniques like Integrated Gradients (IG) into the *More Info* view to visualize high-activation facial regions and build user trust.
@@ -311,7 +335,7 @@ Additional limitations have been identified through experimentation:
 ### Privacy Statement
 - **No data transmission**: All processing remains strictly on-device
 - **No cloud storage**: Biometric data never leaves the device
-- **Offline functionality**: Zero internet permissions required for core functionality
+- **Offline functionality**: No Internet connection is required for the core functionality.
 - **Local storage only**: Optional mood history stored in private SQLite database on the user's device
 - **No third-party sharing**: Emotional data is never shared with external services or third parties
 
